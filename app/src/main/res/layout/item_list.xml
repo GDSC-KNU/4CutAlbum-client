@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="20dp"
+    card_view:cardElevation="2dp"
+    card_view:cardBackgroundColor="#DDDDDD"
+    android:layout_margin="5dp"
+    android:backgroundTint="@color/white">
+    <TextView
+        android:id="@+id/name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이름"
+        android:fontFamily="@font/leferi"
+        android:textFontWeight="900"
+        android:padding="10dp"/>
+
+</androidx.cardview.widget.CardView>

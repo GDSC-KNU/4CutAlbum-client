@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fourcutalbum_nav_graph"
+    app:startDestination="@id/fragment_social">
+
+    <fragment
+        android:id="@+id/fragment_social"
+        android:name="com.gdsc.fourcutalbum.SocialFragment"
+        android:label="fragment_social"
+        tools:layout="@layout/fragment_social" />
+    <fragment
+        android:id="@+id/fragment_album"
+        android:name="com.gdsc.fourcutalbum.AlbumFragment"
+        android:label="fragment_album"
+        tools:layout="@layout/fragment_album" />
+</navigation>

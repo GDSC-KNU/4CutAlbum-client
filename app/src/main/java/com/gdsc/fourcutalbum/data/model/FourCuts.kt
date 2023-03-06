@@ -11,7 +11,10 @@ data class FourCuts(
     val photo: Uri,
     val friends: List<String>?,
     val place: String?,
-    val comment: String?
+    val comment: String?,
+//    val public_yn: Char,
+//    val people: String?,
+//    val hashtag: List<String>?
 ): Serializable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 }

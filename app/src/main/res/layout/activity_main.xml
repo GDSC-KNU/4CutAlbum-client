@@ -15,6 +15,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/ic_baseline_login_24"
+            app:tint="@color/white"
+            app:borderWidth="0dp"
+            android:backgroundTint="@color/main_color"
+            android:layout_margin="20dp"
+            android:id="@+id/btn_login"/>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fourcutalbum_nav_host"
         android:layout_width="match_parent"

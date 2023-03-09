@@ -58,22 +58,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var mainViewModel: MainViewModel
     private lateinit var navController: NavController
 
-    // Google Login
-    private var isLogined = false
-    lateinit var mGoogleSignInClient: GoogleSignInClient
-    lateinit var resultLauncher: ActivityResultLauncher<Intent>
-
-    override fun onStart() {
-        super.onStart()
-        isLogined = getLoginState()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         setupJetpackNavigation()
-        setLogin()
 
         // Room db test
 //        var intent : Intent = Intent(MainActivity@this, TestActivity::class.java)
@@ -93,107 +82,6 @@ class MainActivity : AppCompatActivity() {
         navController = host.navController
         // 내비게이션 뷰를 내비게이션 컨트롤러와 연결
         binding.bottomNavigationView.setupWithNavController(navController)
-    }
-
-    private fun getLoginState() : Boolean {
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-        account?.let {
-            Toast.makeText(this, "자동 로그인 완료!", Toast.LENGTH_SHORT).show()
-            binding.btnLogin.visibility = View.GONE
-            return true
-        } ?: return false
-    }
-
-    private fun setLogin(){
-        // ActivityResultLauncher
-        setResultSignUp()
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.google_client_id))
-            .requestEmail()
-            .requestProfile()
-            .build()
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        binding.btnLogin.setOnClickListener {
-            signIn()
-        }
-    }
-
-    private fun setResultSignUp() {
-        resultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                // 정상적으로 결과가 받아와진다면 조건문 실행
-                if (result.resultCode == Activity.RESULT_OK) {
-                    val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                    handleSignInResult(task)
-                }
-            }
-    }
-
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-            val email = account?.email.toString()
-            val familyName = account?.familyName.toString()
-            val givenName = account?.givenName.toString()
-            val displayName = account?.displayName.toString()
-            val photoUrl = account?.photoUrl.toString()
-
-            Log.d("로그인한 유저의 이메일", email)
-            Log.d("로그인한 유저의 성", familyName)
-            Log.d("로그인한 유저의 이름", givenName)
-            Log.d("로그인한 유저의 전체이름", displayName)
-            Log.d("로그인한 유저의 프로필 사진의 주소", photoUrl)
-
-            Toast.makeText(applicationContext, "$givenName 님 환영합니다!", Toast.LENGTH_SHORT).show()
-            binding.btnLogin.visibility = View.GONE
-
-        } catch (e: ApiException) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("failed", "signInResult:failed code=" + e.statusCode)
-        }
-    }
-
-    private fun signIn() {
-        val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
-        resultLauncher.launch(signInIntent)
-    }
-
-    private fun signOut() {
-        mGoogleSignInClient.signOut()
-            .addOnCompleteListener(this) {
-                // ...
-            }
-    }
-
-    private fun revokeAccess() {
-        mGoogleSignInClient.revokeAccess()
-            .addOnCompleteListener(this) {
-                // ...
-            }
-    }
-
-    private fun GetCurrentUserProfile() {
-        val curUser = GoogleSignIn.getLastSignedInAccount(this)
-        curUser?.let {
-            val email = curUser.email.toString()
-            val familyName = curUser.familyName.toString()
-            val givenName = curUser.givenName.toString()
-            val displayName = curUser.displayName.toString()
-            val photoUrl = curUser.photoUrl.toString()
-            val uid = curUser.idToken.toString()
-
-            Log.d("유저의 고유 UID", uid)
-            Log.d("유저의 이메일", email)
-            Log.d("유저의 성", familyName)
-            Log.d("유저의 이름", givenName)
-            Log.d("유저의 전체이름", displayName)
-            Log.d("유저의 프로필 사진의 주소", photoUrl)
-
-        }
     }
 
 }

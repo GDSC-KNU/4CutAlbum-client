@@ -18,9 +18,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -41,6 +39,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 
+
 class EditActivity : AppCompatActivity() {
     private val binding: ActivityEditBinding by lazy {
         ActivityEditBinding.inflate(layoutInflater)
@@ -48,6 +47,9 @@ class EditActivity : AppCompatActivity() {
 
     lateinit var fourCutsViewModel: FourCutsViewModel
     private var imageUri: Uri = Uri.EMPTY
+    lateinit var studio: String // for Spinner
+    lateinit var people: String // for Spinner
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -61,12 +63,36 @@ class EditActivity : AppCompatActivity() {
         val id = intent.getIntExtra("detail_id", 0)
         if (id > 0) setData(id)
 
+        initStudioSpinner()
+        initPeopleSpinner()
+
         binding.imageIv.setOnClickListener {
             selectGallery()
         }
         binding.editPlusBtn.setOnClickListener {
             makeDialog(binding.editFriendGroup)
         }
+        binding.editPublicSwitch.setOnCheckedChangeListener { compoundButton, isChecked ->
+            if(isChecked){
+                View.VISIBLE.also {
+                    binding.editPeopleDes.visibility = it
+                    binding.editPeopleSpinner.visibility = it
+                    binding.editHashtagDes.visibility = it
+                    binding.editHashtagLayout.visibility = it }
+            }else{
+                View.GONE.also {
+                    binding.editPeopleDes.visibility = it
+                    binding.editPeopleSpinner.visibility = it
+                    binding.editHashtagDes.visibility = it
+                    binding.editHashtagLayout.visibility = it }
+            }
+        }
+
+        binding.editPlusBtn2.setOnClickListener {
+            if (binding.editHashtagGroup.childCount < 3) makeDialog2(binding.editHashtagGroup)
+            else Toast.makeText(this, "해시태그는 3개까지만 등록할 수 있습니다.", Toast.LENGTH_SHORT).show()
+        }
+
         binding.editSaveButton.setOnClickListener {
             val chipList = makeChipList(binding.editFriendGroup)
             if (imageUri == Uri.EMPTY)
@@ -77,7 +103,7 @@ class EditActivity : AppCompatActivity() {
                         binding.editTitle.text.toString(),
                         imageUri,
                         chipList.toList(),
-                        binding.editLocation.text.toString(),
+                        studio,
                         binding.editComment.text.toString()
                     )
                 if (id > 0) fourCutsViewModel.updateFourCuts(fourCuts.title,
@@ -94,17 +120,58 @@ class EditActivity : AppCompatActivity() {
 
     }
 
+    private fun initStudioSpinner() {
+        val spinner : Spinner = binding.editStudioSpinner
+        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this, R.array.studio, R.layout.item_spinner_transparent);
+        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
+        spinner.adapter = spinnerAdapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                studio = parent.getItemAtPosition(position).toString()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+
+            }
+
+        }
+
+
+    }
+
+    private fun initPeopleSpinner() {
+        val spinner : Spinner = binding.editPeopleSpinner
+        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this, R.array.people, R.layout.item_spinner_transparent);
+        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
+        spinner.adapter = spinnerAdapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                people = parent.getItemAtPosition(position).toString()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+
+            }
+        }
+    }
+
     fun setData(id: Int) {
         //Log.d(":::", "set data")
         // val fourCuts = fourCutsViewModel.getFourCutsWithId(id)
         val fourCuts = fourCutsViewModel.getFourCutsWithID(id)
+        var position = 0
 
         lifecycleScope.launchWhenCreated {
             fourCuts.collectLatest {
                 Log.d("EDIT_TEST", it.toString())
                 it.apply {
+                    for(x : String in resources.getStringArray(R.array.studio)){
+                        if(place.equals(x))
+                            position = resources.getStringArray(R.array.studio).indexOf(x)
+                    }
+
                     binding.editTitle.setText(title)
-                    binding.editLocation.setText(place)
+                    binding.editStudioSpinner.setSelection(position)
                     binding.editComment.setText(comment)
 
                     // setting
@@ -114,7 +181,7 @@ class EditActivity : AppCompatActivity() {
 
                     }
                     for (friend: String in friends!!) binding.editFriendGroup.addView(makeChip(
-                        friend))
+                        friend, binding.editFriendGroup))
 
                     Glide.with(binding.root.context).load(it.photo)
                         .override(Target.SIZE_ORIGINAL)
@@ -135,12 +202,12 @@ class EditActivity : AppCompatActivity() {
         return chipList
     }
 
-    private fun makeChip(str: String): Chip {
+    private fun makeChip(str: String, group: ChipGroup): Chip {
         val chip = Chip(this)
         chip.apply {
             text = str
             isCloseIconVisible = true
-            setOnCloseIconClickListener { binding.editFriendGroup.removeView(this) }
+            setOnCloseIconClickListener { group.removeView(this) }
             setCloseIconSize(30f)
             setCloseIconTintResource(R.color.main_color)
             chipStrokeWidth = 2.5f
@@ -176,13 +243,56 @@ class EditActivity : AppCompatActivity() {
                 if (string.isEmpty()) {
                     Toast.makeText(this, "chip 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
                 } else {
-                    group.addView(makeChip(string))
+                    group.addView(makeChip(string, group))
                 }
             }
             .setNegativeButton("취소") { dialog, which ->
             }
         builder.show()
+    }
 
+    private fun makeDialog2(group: ChipGroup) {
+        val sp = Spinner(this)
+        var hashtag : String = ""
+        sp.setBackgroundResource(R.drawable.spinner)
+        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this, R.array.hashtag, R.layout.item_spinner_transparent);
+        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
+
+        sp.adapter = spinnerAdapter
+        sp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                hashtag = parent.getItemAtPosition(position).toString()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+
+            }
+        }
+        val container = FrameLayout(this)
+        val params = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        params.leftMargin = 100
+        params.rightMargin = 100
+        params.topMargin = 50
+        params.height = 150
+        sp.layoutParams = params
+        container.addView(sp)
+        val builder = AlertDialog.Builder(this)
+            .setTitle("해시태그를 선택해주세요")
+            .setView(container)
+            .setPositiveButton("추가") { dialog, which ->
+                val string = hashtag
+                if (string.isEmpty()) {
+                    Toast.makeText(this, "해시태그를 선택해주세요", Toast.LENGTH_SHORT).show()
+                } else {
+                    group.addView(makeChip(string, group))
+                }
+            }
+            .setNegativeButton("취소") { dialog, which ->
+            }
+        builder.show()
     }
 
 

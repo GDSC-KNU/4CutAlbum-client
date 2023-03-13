@@ -13,7 +13,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <EditText
                 android:id="@+id/editTitle"
                 android:layout_width="match_parent"
@@ -98,19 +97,16 @@
 
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/editLocation"
+            <Spinner
+                android:id="@+id/editStudioSpinner"
+                android:spinnerMode="dropdown"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="45dp"
                 android:layout_margin="10dp"
-                android:background="@drawable/round_tv"
-                android:fontFamily="@font/leferi"
-                android:hint="입력해 주세요."
-                android:inputType="text"
-                android:maxLines="1"
-                android:padding="12dp"
-                android:textFontWeight="900"
-                app:layout_constraintTop_toBottomOf="@id/editLocationDes" />
+                android:background="@drawable/spinner"
+                android:popupBackground="@drawable/spinner"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/editLocationDes"/>
 
 
             <TextView
@@ -121,17 +117,122 @@
                 android:text="코멘트"
                 android:textFontWeight="900"
                 android:textSize="15sp"
-                app:layout_constraintTop_toBottomOf="@id/editLocation" />
+                app:layout_constraintTop_toBottomOf="@id/editStudioSpinner" />
 
             <TextView
                 android:id="@+id/editLocationDes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="위치"
+                android:text="스튜디오"
                 android:textFontWeight="900"
                 android:textSize="15sp"
                 app:layout_constraintTop_toBottomOf="@id/editLayout" />
+
+            <LinearLayout
+                android:id="@+id/editPublic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editComment">
+
+                <TextView
+                    android:id="@+id/editPublicDes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="전체공개 여부"
+                    android:textFontWeight="900"
+                    android:textSize="15sp"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/editPublicSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:layout_marginLeft="20dp"
+                    android:thumb="@drawable/check_switch_thumb"
+                    app:track="@drawable/check_switch_track"
+                    app:thumbTextPadding="24dp"
+                    app:switchMinWidth="0dp"
+                    android:textOff=""
+                    android:textOn=""/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/editPeopleDes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                android:text="인원수"
+                android:textFontWeight="900"
+                android:textSize="15sp"
+                app:layout_constraintTop_toBottomOf="@id/editPublic"/>
+
+            <Spinner
+                android:id="@+id/editPeopleSpinner"
+                android:spinnerMode="dropdown"
+                android:layout_width="250dp"
+                android:layout_height="45dp"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                android:background="@drawable/spinner"
+                android:popupBackground="@drawable/spinner"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/editPeopleDes"/>
+
+            <TextView
+                android:id="@+id/editHashtagDes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="10dp"
+                android:visibility="gone"
+                android:text="해시태그(최대 3개)"
+                android:textFontWeight="900"
+                android:textSize="15sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/editPeopleSpinner" />
+
+            <LinearLayout
+                android:id="@+id/editHashtagLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/editHashtagDes">
+
+                <HorizontalScrollView
+                    android:layout_weight="10"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/editHashtagGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
+                </HorizontalScrollView>
+
+                <ImageButton
+                    android:id="@+id/editPlusBtn2"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/round_button"
+                    android:src="@drawable/ic_baseline_add_24"
+                    app:tint="@color/white" />
+
+            </LinearLayout>
+
+
 
             <android.widget.Button
                 android:id="@+id/editSaveButton"
@@ -145,11 +246,11 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/editComment" />
+                app:layout_constraintTop_toBottomOf="@+id/editHashtagLayout"
+                app:layout_constraintStart_toStartOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/fragment_social"
-        android:title="둘러보기"
-        />
-
     <item android:id="@+id/fragment_album"
         android:title="나의 앨범"
+        android:icon="@drawable/my_album"
+        />
+
+    <item android:id="@+id/fragment_social"
+        android:title="둘러보기"
+        android:icon="@drawable/social_search"
         />
 
 </menu>

@@ -1,6 +1,5 @@
-package com.gdsc.fourcutalbum
+package com.gdsc.fourcutalbum.ui.fragment
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
@@ -11,17 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.gdsc.fourcutalbum.adapter.MainSampleAdapter
-import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.model.FourCuts
-import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
 import com.gdsc.fourcutalbum.databinding.FragmentAlbumBinding
+import com.gdsc.fourcutalbum.ui.activity.EditActivity
+import com.gdsc.fourcutalbum.ui.activity.MainActivity
 import com.gdsc.fourcutalbum.viewmodel.MainViewModel
-import com.gdsc.fourcutalbum.viewmodel.MainViewModelProviderFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 

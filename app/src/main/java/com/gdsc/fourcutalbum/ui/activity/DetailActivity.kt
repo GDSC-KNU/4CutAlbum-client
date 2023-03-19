@@ -1,4 +1,4 @@
-package com.gdsc.fourcutalbum
+package com.gdsc.fourcutalbum.ui.activity
 
 import android.app.ActivityOptions
 import android.content.Intent

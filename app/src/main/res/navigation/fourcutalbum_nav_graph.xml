@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/fragment_social"
-        android:name="com.gdsc.fourcutalbum.SocialFragment"
+        android:name="com.gdsc.fourcutalbum.ui.fragment.SocialFragment"
         android:label="fragment_social"
         tools:layout="@layout/fragment_social" />
     <fragment
         android:id="@+id/fragment_album"
-        android:name="com.gdsc.fourcutalbum.AlbumFragment"
+        android:name="com.gdsc.fourcutalbum.ui.fragment.AlbumFragment"
         android:label="fragment_album"
         tools:layout="@layout/fragment_album" />
 </navigation>

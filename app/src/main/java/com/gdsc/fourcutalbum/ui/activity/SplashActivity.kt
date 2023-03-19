@@ -1,4 +1,4 @@
-package com.gdsc.fourcutalbum
+package com.gdsc.fourcutalbum.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.gdsc.fourcutalbum.databinding.ActivityMainBinding
+import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.databinding.ActivitySplashBinding
 
 

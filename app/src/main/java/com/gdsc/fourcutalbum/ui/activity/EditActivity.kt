@@ -1,4 +1,4 @@
-package com.gdsc.fourcutalbum
+package com.gdsc.fourcutalbum.ui.activity
 
 import android.Manifest
 import android.app.AlertDialog
@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.model.FourCuts
 import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
@@ -122,7 +123,10 @@ class EditActivity : AppCompatActivity() {
 
     private fun initStudioSpinner() {
         val spinner : Spinner = binding.editStudioSpinner
-        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this, R.array.studio, R.layout.item_spinner_transparent);
+        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,
+            R.array.studio,
+            R.layout.item_spinner_transparent
+        );
         spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
         spinner.adapter = spinnerAdapter
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -141,7 +145,10 @@ class EditActivity : AppCompatActivity() {
 
     private fun initPeopleSpinner() {
         val spinner : Spinner = binding.editPeopleSpinner
-        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this, R.array.people, R.layout.item_spinner_transparent);
+        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,
+            R.array.people,
+            R.layout.item_spinner_transparent
+        );
         spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
         spinner.adapter = spinnerAdapter
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -255,7 +262,10 @@ class EditActivity : AppCompatActivity() {
         val sp = Spinner(this)
         var hashtag : String = ""
         sp.setBackgroundResource(R.drawable.spinner)
-        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this, R.array.hashtag, R.layout.item_spinner_transparent);
+        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,
+            R.array.hashtag,
+            R.layout.item_spinner_transparent
+        );
         spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
 
         sp.adapter = spinnerAdapter

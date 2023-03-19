@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target.SIZE_ORIGINAL
-import com.gdsc.fourcutalbum.DetailActivity
+import com.gdsc.fourcutalbum.ui.activity.DetailActivity
 import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.model.FourCuts

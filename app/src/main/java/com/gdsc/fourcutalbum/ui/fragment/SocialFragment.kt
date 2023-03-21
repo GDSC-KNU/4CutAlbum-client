@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +13,13 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.gdsc.fourcutalbum.R
+import com.gdsc.fourcutalbum.adapter.MainSampleAdapter
+import com.gdsc.fourcutalbum.adapter.MainSocialSampleAdapter
 import com.gdsc.fourcutalbum.common.Constants
+import com.gdsc.fourcutalbum.data.model.Feed
+import com.gdsc.fourcutalbum.data.model.FeedList
 import com.gdsc.fourcutalbum.data.model.SignupResponseModel
 import com.gdsc.fourcutalbum.databinding.FragmentSocialBinding
 import com.gdsc.fourcutalbum.service.HttpService
@@ -34,6 +40,8 @@ class SocialFragment : Fragment() {
     private var _binding: FragmentSocialBinding? = null
     private val binding get() = _binding!!
     lateinit var context_: Context
+    private var mainSocialAdapter: MainSocialSampleAdapter? = MainSocialSampleAdapter()
+    private var recyclerViewState: Parcelable? = null
 
     // Google Login
     private var isLogined = false
@@ -50,6 +58,25 @@ class SocialFragment : Fragment() {
         isLogined = getLoginState()
         setLogin()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        //setRecyclerView() // Test용 - 실제로는 로그인 확인되면 Recyclerview 만들기?
+    }
+
+    // onResume() 에서 저장해둔 리사이클러뷰 상태를 다시 set
+    override fun onResume() {
+        super.onResume()
+        if (recyclerViewState != null) {
+            binding.rvSocial.layoutManager?.onRestoreInstanceState(recyclerViewState)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // LayoutManager를 불러와 Parcelable 변수에 리사이클러뷰 상태를 Bundle 형태로 저장한다
+        recyclerViewState = binding.rvSocial.layoutManager?.onSaveInstanceState()
     }
 
     override fun onDestroyView() {
@@ -118,7 +145,8 @@ class SocialFragment : Fragment() {
                         if(response.body()!!.data){
                             Toast.makeText(context_, "환영합니다!", Toast.LENGTH_SHORT).show()
                             binding.viewLogin.visibility = View.GONE
-                        } else{
+//                            setRecyclerView()   // 로그인 성공 시 리스트 생성
+                        } else{ // 회원이 존재하지 않으면 false 전달
                             Toast.makeText(context_, "처음이시네요, 닉네임을 설정해 주세요!", Toast.LENGTH_SHORT).show()
 
                             val intent = Intent(context_, RegisterActivity::class.java)
@@ -208,6 +236,47 @@ class SocialFragment : Fragment() {
         }
     }
     /* --- 로그인 코드 --- */
+
+    fun setRecyclerView() {
+        try {
+            val data =  HttpService.create(Constants.SERVER_URL).getFeedList("인생네컷", 2, "test1,test2", 0)
+            var `res` : FeedList? = null
+            Log.d("DBG:RETRO", "SENDED")
+
+            data.enqueue(object : Callback<FeedList?> {
+                override fun onResponse(call: Call<FeedList?>, response: Response<FeedList?>) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Log.d("DBG:RETRO", "response success: " + response.body().toString())
+
+                        `res` = response.body()
+
+                        mainSocialAdapter?.let {
+                            it.setListInit(res!!.feedList)
+                        }
+
+                        binding.rvSocial.apply {
+                            setHasFixedSize(true)
+                            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                            adapter = mainSocialAdapter
+                        }
+
+                        mainSocialAdapter!!.notifyDataSetChanged()
+
+                    }else{
+                        Log.d("DBG:RETRO", "response else: " + response.toString())
+                    }
+                }
+                override fun onFailure(call: Call<FeedList?>, t: Throwable) {
+                    t.printStackTrace()
+                }
+            })
+
+        } catch (e:Exception){
+            e.printStackTrace()
+            Toast.makeText(context_,"서버와 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_LONG).show()
+        }
+
+    }
 
 
 

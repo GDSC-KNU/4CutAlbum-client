@@ -258,7 +258,7 @@ class EditActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun makeDialog2(group: ChipGroup) {
+    private fun makeDialog2(group: ChipGroup) { // Dialog - Spinner
         val sp = Spinner(this)
         var hashtag : String = ""
         sp.setBackgroundResource(R.drawable.spinner)

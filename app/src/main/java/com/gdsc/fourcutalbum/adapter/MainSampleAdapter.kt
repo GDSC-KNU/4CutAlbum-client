@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gdsc.fourcutalbum.data.model.FourCuts
 import com.gdsc.fourcutalbum.databinding.ListItemMainBinding
 
-
+// AlbumFragment
 class MainSampleAdapter : RecyclerView.Adapter<MainSampleViewHolder>() {
     private var datas: ArrayList<FourCuts>? = null
 

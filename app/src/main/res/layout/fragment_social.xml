@@ -36,32 +36,47 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/socialLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.cardview.widget.CardView
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="15dp"
+            android:padding="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginHorizontal="15dp"
-            app:cardElevation="3dp"
-            app:cardCornerRadius="15dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/sv_main"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:iconifiedByDefault="false"
-                android:theme="@style/AppSearchView"
-                app:queryBackground="@null"
-                app:queryHint="장소 또는 친구 이름 검색"/>
-        </androidx.cardview.widget.CardView>
+                android:text="@string/app_name"
+                android:textStyle="bold"
+                android:textFontWeight="900"
+                android:gravity="start"
+                android:textColor="@color/black"
+                android:textSize="36sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <ImageButton
+                android:id="@+id/socialSearchBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/search"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_main"
+            android:id="@+id/rv_social"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="10dp"

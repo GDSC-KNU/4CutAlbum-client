@@ -6,21 +6,62 @@
     android:layout_margin="7dp"
     app:cardCornerRadius="25dp"
     app:cardElevation="5dp">
-    <ImageView
-        android:id="@+id/iv_item"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:src="#F1CFCE"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/cardFeedHashtagList"
-        android:layout_weight="10"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="20dp"
-        android:layout_gravity="bottom">
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/feedSampleImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:src="#F1CFCE"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/feed_gradient"/>
 
-    </androidx.recyclerview.widget.RecyclerView>
+    </FrameLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="10dp">
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/feedSampleHashtagList"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginHorizontal="5dp">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tag1"
+            app:chipMinTouchTargetSize="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/transparent"
+            app:chipSurfaceColor="@color/transparent"
+            android:textColor="@color/white"
+            android:visibility="gone"/>
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tag2"
+            app:chipMinTouchTargetSize="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/transparent"
+            app:chipSurfaceColor="@color/transparent"
+            android:textColor="@color/white"
+            android:visibility="gone"/>
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tag3"
+            app:chipMinTouchTargetSize="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/transparent"
+            app:chipSurfaceColor="@color/transparent"
+            android:textColor="@color/white"
+            android:visibility="gone"/>
+    </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 
 </androidx.cardview.widget.CardView>

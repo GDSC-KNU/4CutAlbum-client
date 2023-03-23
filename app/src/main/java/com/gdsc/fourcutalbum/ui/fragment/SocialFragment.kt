@@ -57,13 +57,10 @@ class SocialFragment : Fragment() {
         context?.let { context_ = it }
         isLogined = getLoginState()
         setLogin()
+
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //setRecyclerView() // Test용 - 실제로는 로그인 확인되면 Recyclerview 만들기?
-    }
 
     // onResume() 에서 저장해둔 리사이클러뷰 상태를 다시 set
     override fun onResume() {
@@ -145,7 +142,9 @@ class SocialFragment : Fragment() {
                         if(response.body()!!.data){
                             Toast.makeText(context_, "환영합니다!", Toast.LENGTH_SHORT).show()
                             binding.viewLogin.visibility = View.GONE
-//                            setRecyclerView()   // 로그인 성공 시 리스트 생성
+
+                            setRecyclerView()   // 로그인 성공 시 리스트 생성
+
                         } else{ // 회원이 존재하지 않으면 false 전달
                             Toast.makeText(context_, "처음이시네요, 닉네임을 설정해 주세요!", Toast.LENGTH_SHORT).show()
 

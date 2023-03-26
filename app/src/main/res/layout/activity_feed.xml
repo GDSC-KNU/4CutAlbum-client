@@ -8,43 +8,35 @@
 
     <LinearLayout
         android:id="@+id/feed_layout"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <FrameLayout
+        <ImageButton
+            android:id="@+id/backBtn"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="20dp"
+            android:background="@drawable/back"
+            android:scaleType="fitCenter" />
+
+        <ImageView
+            android:id="@+id/feedImage"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="7"
-            android:elevation="5dp">
-            <ImageView
-                android:id="@+id/feedImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:src="@drawable/navcolor"/>
-            <ImageButton
-                android:id="@+id/backBtn"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:scaleType="fitCenter"
-                android:layout_margin="20dp"
-                android:background="@drawable/back"/>
-        </FrameLayout>
-
-
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/navcolor" />
 
         <LinearLayout
             android:id="@+id/feed_info_layout"
             android:layout_width="match_parent"
-            android:orientation="vertical"
-            android:layout_height="0dp"
-            android:layout_weight="3">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_margin="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="15dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -54,21 +46,22 @@
                     android:layout_height="30dp"
                     android:background="@drawable/profile_image"
                     android:src="@drawable/navcolor"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/tv_nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:text="구글 아이디"
                     android:textFontWeight="1000"
-                    android:textStyle="bold"
                     android:textSize="20sp"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/profileImage"/>
+                    app:layout_constraintStart_toEndOf="@+id/profileImage"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
                     android:id="@+id/like"
@@ -76,49 +69,56 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    app:layout_constraintEnd_toStartOf="@+id/comment"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/comment"
                     app:layout_constraintTop_toTopOf="parent">
+
                     <ImageButton
                         android:id="@+id/likeBtn"
                         android:layout_width="30dp"
-                        android:layout_height="30dp"/>
+                        android:layout_height="30dp" />
+
                     <TextView
                         android:id="@+id/likeCnt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"/>
+                        android:text="0" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:id="@+id/comment"
-                    android:layout_gravity="end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="end"
                     android:gravity="center"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
                     <ImageButton
                         android:id="@+id/commentBtn"
                         android:layout_width="30dp"
-                        android:layout_height="30dp"/>
+                        android:layout_height="30dp" />
+
                     <TextView
                         android:id="@+id/commentCnt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0"/>
+                        android:text="0" />
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
             <TextView
+                android:id="@+id/tv_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="15dp"
+                android:text="누구랑 누구랑 함께"
                 android:textFontWeight="900"
-                android:textSize="15sp"
-                android:text="누구랑 누구랑 함께"/>
+                android:textSize="15sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -130,32 +130,33 @@
                     android:id="@+id/people_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="혼자서"
-                    android:textFontWeight="900"
-                    android:paddingVertical="10dp"
+                    android:background="@drawable/round_tv"
                     android:paddingHorizontal="20dp"
-                    android:background="@drawable/round_tv"/>
+                    android:paddingVertical="10dp"
+                    android:text="혼자서"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/studio_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="포토이즘"
-                    android:textFontWeight="900"
-                    android:paddingVertical="10dp"
+                    android:layout_marginStart="10dp"
+                    android:background="@drawable/round_tv"
                     android:paddingHorizontal="20dp"
-                    android:background="@drawable/round_tv"/>
+                    android:paddingVertical="10dp"
+                    android:text="포토이즘"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/hashtagList"
-                android:layout_marginHorizontal="15dp"
-                android:layout_marginBottom="15dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginBottom="15dp" />
 
-            
 
         </LinearLayout>
 

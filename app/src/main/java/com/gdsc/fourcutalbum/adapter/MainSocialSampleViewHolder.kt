@@ -20,7 +20,7 @@ class MainSocialSampleViewHolder(private var binding: ListItemFeedBinding, conte
     fun bind(data: Feed) {
         binding.root.setOnClickListener {
             val intent = Intent(binding.root.context, FeedActivity::class.java)
-            intent.putExtra("id", data.feed_id)
+            intent.putExtra("data", data)
             binding.root.context.startActivity(intent)
         }
 

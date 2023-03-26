@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="7dp"
-    app:cardCornerRadius="25dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="5dp">
 
     <FrameLayout
@@ -31,7 +31,7 @@
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/feedSampleHashtagList"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="5dp">
 
         <com.google.android.material.chip.Chip
@@ -42,6 +42,8 @@
             android:backgroundTint="@color/transparent"
             app:chipSurfaceColor="@color/transparent"
             android:textColor="@color/white"
+            android:textStyle="bold"
+            android:fontFamily="@font/leferi"
             android:visibility="gone"/>
         <com.google.android.material.chip.Chip
             android:id="@+id/tag2"
@@ -51,6 +53,8 @@
             android:backgroundTint="@color/transparent"
             app:chipSurfaceColor="@color/transparent"
             android:textColor="@color/white"
+            android:fontFamily="@font/leferi"
+            android:textStyle="bold"
             android:visibility="gone"/>
         <com.google.android.material.chip.Chip
             android:id="@+id/tag3"
@@ -58,8 +62,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:backgroundTint="@color/transparent"
+            android:textStyle="bold"
             app:chipSurfaceColor="@color/transparent"
             android:textColor="@color/white"
+            android:fontFamily="@font/leferi"
             android:visibility="gone"/>
     </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>

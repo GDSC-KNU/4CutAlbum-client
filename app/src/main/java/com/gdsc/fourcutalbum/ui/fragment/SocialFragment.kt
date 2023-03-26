@@ -179,16 +179,13 @@ class SocialFragment : Fragment() {
             val displayName = account?.displayName.toString()
             val photoUrl = account?.photoUrl.toString()
             val uid = account?.idToken.toString()
-
-            memberCheckAPI(uid, email)
-
             Log.d("로그인한 유저의 이메일", email)
             Log.d("로그인한 유저의 성", familyName)
             Log.d("로그인한 유저의 이름", givenName)
             Log.d("로그인한 유저의 전체이름", displayName)
             Log.d("로그인한 유저의 프로필 사진의 주소", photoUrl)
 
-
+            memberCheckAPI(uid, email)
 
         } catch (e: ApiException) {
             // The ApiException status code indicates the detailed failure reason.

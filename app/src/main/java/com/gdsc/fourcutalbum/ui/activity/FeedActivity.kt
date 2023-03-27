@@ -50,8 +50,11 @@ class FeedActivity: AppCompatActivity() {
                     if (response.isSuccessful() && response.body() != null) {
                         Log.d("DBG:RETRO", "response success: " + response.body().toString())
 
-                        binding.tvComment.text = response.body()?.comment
-                        binding.tvNickname.text = response.body()?.nick_name
+                        response.body()?.let {
+                            binding.tvComment.text = it.comment
+                            binding.tvNickname.text = it.nick_name
+                            binding.likeCnt.text = it.like.toString()
+                        }
 
                     }else{
                         Log.d("DBG:RETRO", "response else: " + response.toString())

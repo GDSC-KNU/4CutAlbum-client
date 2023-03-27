@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -13,17 +14,24 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.gdsc.fourcutalbum.adapter.DetailAdapter
+import com.gdsc.fourcutalbum.common.Constants
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
+import com.gdsc.fourcutalbum.data.model.FeedList
 import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
 import com.gdsc.fourcutalbum.databinding.ActivityDetailBinding
+import com.gdsc.fourcutalbum.service.HttpService
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModel
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModelProviderFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class DetailActivity: AppCompatActivity() {
     lateinit var imageUri: Uri
@@ -74,6 +82,8 @@ class DetailActivity: AppCompatActivity() {
             }
         }
     }
+
+
 
     fun setInitialize(){
         binding = ActivityDetailBinding.inflate(layoutInflater)

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.gdsc.fourcutalbum.R
@@ -57,6 +58,7 @@ class SocialFragment : Fragment() {
         context?.let { context_ = it }
         isLogined = getLoginState()
         setLogin()
+        setSearch()
 
         return binding.root
     }
@@ -143,7 +145,7 @@ class SocialFragment : Fragment() {
                             Toast.makeText(context_, "환영합니다!", Toast.LENGTH_SHORT).show()
                             binding.viewLogin.visibility = View.GONE
 
-                            setRecyclerView()   // 로그인 성공 시 리스트 생성
+                            setRecyclerView("")   // 로그인 성공 시 리스트 생성
 
                         } else{ // 회원이 존재하지 않으면 false 전달
                             Toast.makeText(context_, "처음이시네요, 닉네임을 설정해 주세요!", Toast.LENGTH_SHORT).show()
@@ -194,6 +196,28 @@ class SocialFragment : Fragment() {
         }
     }
 
+    fun setSearch(){
+        binding.socialSearchBtn.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // 검색 버튼 누를 때
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // 검색창에서 글자가 변경이 일어날 때마다 호출
+                newText?.let {
+                    if (it == "") {
+                        setRecyclerView("")
+                        Log.d("DBG::SEARCH", "GET_ALL")
+                    } else {
+                        setRecyclerView(it)
+                    }
+                }
+                return true
+            }
+        })
+    }
+
     private fun signIn() {
         val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
         resultLauncher.launch(signInIntent)
@@ -233,9 +257,10 @@ class SocialFragment : Fragment() {
     }
     /* --- 로그인 코드 --- */
 
-    fun setRecyclerView() {
+    fun setRecyclerView(query: String) {
         try {
-            val data =  HttpService.create(Constants.SERVER_URL).getFeedList("인생네컷", 2, "test1,test2", 0)
+
+            val data =  HttpService.create(Constants.SERVER_URL).getFeedList(query, 2, "test1,test2", 0)
             var `res` : FeedList? = null
             Log.d("DBG:RETRO", "SENDED")
 

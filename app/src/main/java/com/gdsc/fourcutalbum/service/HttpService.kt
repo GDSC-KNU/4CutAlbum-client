@@ -1,6 +1,7 @@
 package com.gdsc.fourcutalbum.service
 
 import com.gdsc.fourcutalbum.common.Constants
+import com.gdsc.fourcutalbum.data.model.FeedDetail
 import com.gdsc.fourcutalbum.data.model.FeedList
 import com.gdsc.fourcutalbum.data.model.SignupRequestModel
 import com.gdsc.fourcutalbum.data.model.SignupResponseModel
@@ -20,6 +21,12 @@ interface HttpService {
     fun getSignupCheck(
         @Query("uid") uid: String
     ): Call<SignupResponseModel>
+
+    @GET(Constants.FEEDDETAIL)
+    @Headers("accept: application/json","charset:utf-8")
+    fun getFeedDetail(
+        @Query("id") id: Int
+    ): Call<FeedDetail>
 
     @POST(Constants.API_SIGNUP)
     @Headers("accept: application/json","charset:utf-8")

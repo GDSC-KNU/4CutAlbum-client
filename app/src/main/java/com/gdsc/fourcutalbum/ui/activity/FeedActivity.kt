@@ -2,14 +2,23 @@ package com.gdsc.fourcutalbum.ui.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.adapter.HashtagAdapter
+import com.gdsc.fourcutalbum.common.Constants
 import com.gdsc.fourcutalbum.data.model.Feed
+import com.gdsc.fourcutalbum.data.model.FeedDetail
+import com.gdsc.fourcutalbum.data.model.FeedList
 import com.gdsc.fourcutalbum.databinding.ActivityFeedBinding
+import com.gdsc.fourcutalbum.service.HttpService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class FeedActivity: AppCompatActivity() {
@@ -26,7 +35,37 @@ class FeedActivity: AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setInitialize()
+        setServerData()
         setHashtagList()
+
+    }
+
+    fun setServerData(){
+        try {
+            val dataservice =  HttpService.create(Constants.SERVER_URL).getFeedDetail(data.feed_id)
+            Log.d("DBG:RETRO", "SENDED")
+
+            dataservice.enqueue(object : Callback<FeedDetail?> {
+                override fun onResponse(call: Call<FeedDetail?>, response: Response<FeedDetail?>) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Log.d("DBG:RETRO", "response success: " + response.body().toString())
+
+                        binding.tvComment.text = response.body()?.comment
+                        binding.tvNickname.text = response.body()?.nick_name
+
+                    }else{
+                        Log.d("DBG:RETRO", "response else: " + response.toString())
+                    }
+                }
+                override fun onFailure(call: Call<FeedDetail?>, t: Throwable) {
+                    t.printStackTrace()
+                }
+            })
+
+        } catch (e:Exception){
+            e.printStackTrace()
+            Toast.makeText(applicationContext,"서버와 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_LONG).show()
+        }
 
     }
 

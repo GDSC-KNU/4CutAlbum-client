@@ -64,7 +64,7 @@ class ImageActivity : AppCompatActivity() {
         val database = FourCutsDatabase.getInstance(this)
         val fourCutsRepository = FourCutsRepositoryImpl(database)
         val fourCuts = fourCutsRepository.getFourCutsWithId(id).stateIn(lifecycleScope, SharingStarted.WhileSubscribed(5000),
-            FourCuts("", Uri.EMPTY, listOf(),"","")
+            FourCuts("", Uri.EMPTY, listOf(),"","", "N", 1, listOf())
         )
 
         lifecycleScope.launch {

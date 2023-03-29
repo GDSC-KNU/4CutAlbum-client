@@ -33,6 +33,7 @@ import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.model.FourCuts
 import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
 import com.gdsc.fourcutalbum.databinding.ActivityEditBinding
+import com.gdsc.fourcutalbum.util.Util
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModel
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModelProviderFactory
 import com.google.android.material.chip.Chip
@@ -50,6 +51,7 @@ class EditActivity : AppCompatActivity() {
     private var imageUri: Uri = Uri.EMPTY
     lateinit var studio: String // for Spinner
     lateinit var people: String // for Spinner
+    private var public_yn : String = "N"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,12 +78,14 @@ class EditActivity : AppCompatActivity() {
         binding.editPublicSwitch.setOnCheckedChangeListener { compoundButton, isChecked ->
             if(isChecked){
                 View.VISIBLE.also {
+                    public_yn = "Y"
                     binding.editPeopleDes.visibility = it
                     binding.editPeopleSpinner.visibility = it
                     binding.editHashtagDes.visibility = it
                     binding.editHashtagLayout.visibility = it }
             }else{
                 View.GONE.also {
+                    public_yn = "N"
                     binding.editPeopleDes.visibility = it
                     binding.editPeopleSpinner.visibility = it
                     binding.editHashtagDes.visibility = it
@@ -96,6 +100,7 @@ class EditActivity : AppCompatActivity() {
 
         binding.editSaveButton.setOnClickListener {
             val chipList = makeChipList(binding.editFriendGroup)
+            val hashtagList = makeChipList(binding.editHashtagGroup)
             if (imageUri == Uri.EMPTY)
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
             else {
@@ -105,13 +110,20 @@ class EditActivity : AppCompatActivity() {
                         imageUri,
                         chipList.toList(),
                         studio,
-                        binding.editComment.text.toString()
+                        binding.editComment.text.toString(),
+                        public_yn,
+                        Util().peopleToValue(people),
+                        hashtagList
                     )
-                if (id > 0) fourCutsViewModel.updateFourCuts(fourCuts.title,
+                if (id > 0) fourCutsViewModel.updateFourCuts(
+                    fourCuts.title,
                     fourCuts.photo,
                     fourCuts.friends,
                     fourCuts.place,
                     fourCuts.comment,
+                    fourCuts.public_yn,
+                    fourCuts.people,
+                    fourCuts.hashtag,
                     id)
                 else fourCutsViewModel.saveFourCuts(fourCuts)
                 finish()
@@ -180,6 +192,8 @@ class EditActivity : AppCompatActivity() {
                     binding.editTitle.setText(title)
                     binding.editStudioSpinner.setSelection(position)
                     binding.editComment.setText(comment)
+                    binding.editPublicSwitch.isChecked = public_yn.equals("Y")
+                    binding.editPeopleSpinner.setSelection(people?.minus(1) ?: 0)
 
                     // setting
                     val cnt = binding.editFriendGroup.childCount
@@ -189,6 +203,18 @@ class EditActivity : AppCompatActivity() {
                     }
                     for (friend: String in friends!!) binding.editFriendGroup.addView(makeChip(
                         friend, binding.editFriendGroup))
+
+                    val cnt2 = binding.editHashtagGroup.childCount
+                    for (i: Int in 1..cnt2) { // clear
+                        binding.editHashtagGroup.removeView(binding.editHashtagGroup.getChildAt(0) as Chip)
+
+                    }
+                    if(!hashtag.isNullOrEmpty()) { // 기존 데이터 대비
+                        for (tag: String in hashtag!!) binding.editHashtagGroup
+                            .addView(makeChip(tag, binding.editHashtagGroup)
+                        )
+                    }
+
 
                     Glide.with(binding.root.context).load(it.photo)
                         .override(Target.SIZE_ORIGINAL)

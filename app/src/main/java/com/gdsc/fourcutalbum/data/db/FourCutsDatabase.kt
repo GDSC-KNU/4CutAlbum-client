@@ -12,21 +12,20 @@ import com.gdsc.fourcutalbum.data.model.FourCuts
 
 @Database(
     entities = [FourCuts::class],
-    version = 1,
-    exportSchema = false
+    version = 2, // 왜 올렸는데 안올렸다고 ㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹ
+    exportSchema = true
 )
 @TypeConverters(OrmConverter::class)
 abstract class FourCutsDatabase : RoomDatabase(){
 
     abstract fun fourCutsDao() : FourCutsDao
-
     // Singleton
     companion object {
         @Volatile
         private var INSTANCE: FourCutsDatabase? = null
 
         // Google에서는 ALTER TABLE보다 DROP&CREATE 추천
-        // 단순 컬럼 추가라 자동 Migration써도 될듯 하지만...? 일단 수동으로 작성
+        // 단순 컬럼 추가라 자동 Migration써도 될듯 하지만...? 일단 수동으로 작성 (데이터 보존 필요)
         // SQLite :  NULL, INTEGER(->int가능), REAL, TEXT(->VARCHAR가능), BLOB
         /*
         *   처음 migration 시도 시
@@ -35,28 +34,31 @@ abstract class FourCutsDatabase : RoomDatabase(){
         *   그래서 그냥 DROP&CREATE 하는게 나을지도....
         *
         */
-//        private val MIGRATION_1_TO_2: Migration = object : Migration(1,2) {
-//            override fun migrate(database: SupportSQLiteDatabase) {
-//                // 변경하고자 하는 내용
-//                database.run {
-//                   execSQL(
-//                        "CREATE TABLE IF NOT EXISTS new_fourcuts (" +
-//                                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL DEFAULT 0, " +
-//                                "title TEXT, " +
-//                                "photo TEXT, " +
-//                                "friends TEXT, " +
-//                                "place TEXT, " +
-//                                "public_yn TEXT NOT NULL DEFAULT 'N', " +
-//                                "people TEXT, " +
-//                                "hashtag TEXT)"
-//                    );
-//                    execSQL("INSERT INTO new_fourcuts (id, title, photo, friends, place, public_yn, people, hashtag) " +
-//                            "SELECT id, title, photo, friends, place, public_yn, people, hashtag FROM fourcuts");
-//                    execSQL("DROP TABLE fourcuts");
-//                    execSQL("ALTER TABLE new_fourcuts RENAME TO fourcuts");
-//                }
-//            }
-//        }
+        private val MIGRATION_1_TO_2: Migration = object : Migration(1,2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // 변경하고자 하는 내용
+                // 왜 Char로 하면 자꾸 INTEGER로 인식할까,,,ㅠㅠ
+                database.run {
+                    execSQL(
+                        "CREATE TABLE IF NOT EXISTS new_fourcuts (" +
+                                "title TEXT, " +
+                                "photo TEXT NOT NULL, " +
+                                "friends TEXT, " +
+                                "place TEXT, " +
+                                "comment TEXT, " +
+                                "public_yn TEXT NOT NULL DEFAULT 'N', " +
+                                "people INTEGER, " +
+                                "hashtag TEXT, " +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL) "
+                    );
+                    execSQL("INSERT INTO new_fourcuts (id, title, photo, friends, place, comment) " +
+                            "SELECT id, title, photo, friends, place, comment FROM fourcuts");
+                    execSQL("DROP TABLE fourcuts");
+                    execSQL("ALTER TABLE new_fourcuts RENAME TO fourcuts");
+                }
+            }
+        }
+
 
 
         private fun buildDatabase(context: Context): FourCutsDatabase =
@@ -64,11 +66,16 @@ abstract class FourCutsDatabase : RoomDatabase(){
                 context.applicationContext,
                 FourCutsDatabase::class.java,
                 "my-fourcuts"
-            ).build()
-    //.addMigrations(MIGRATION_1_TO_2)
+            ).addMigrations(MIGRATION_1_TO_2).build()
+
         fun getInstance(context: Context) : FourCutsDatabase =
             INSTANCE ?: synchronized(this){
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
     }
 }
+
+// 오류 반복...
+// Schema가 변경된 것 같으니 버전 넘버를 올려라.
+// Migration이 제대로 안됐다. Expected, Found 다른점 찾기
+// Null이 될 수 없는 파라미터가 null이다. --> toList(), hashtag에서 오류

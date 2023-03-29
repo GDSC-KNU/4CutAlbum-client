@@ -17,8 +17,12 @@ interface FourCutsDao {
     @Query("DELETE FROM fourcuts WHERE id LIKE :id")
     fun deleteFourCutsWithId(id: Int)
 
-    @Query("UPDATE fourcuts SET title = :title, photo = :photo, friends = :friends, place = :place, comment = :comment WHERE ID LIKE :id")
-    suspend fun updateFourCuts(title: String?, photo: Uri, friends: List<String>?, place: String?, comment: String?, id: Int)
+    @Query("UPDATE fourcuts SET title = :title, photo = :photo, friends = :friends, " +
+            "place = :place, comment = :comment, public_yn = :public_yn, people = :people, hashtag = :hashtag" +
+            " WHERE ID LIKE :id")
+    suspend fun updateFourCuts(
+        title: String?, photo: Uri, friends: List<String>?,
+        place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?, id: Int)
 
     @Query("SELECT * FROM fourcuts")
     fun getFourCuts() : Flow<List<FourCuts>>

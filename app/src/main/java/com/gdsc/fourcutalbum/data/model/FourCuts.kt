@@ -2,6 +2,8 @@ package com.gdsc.fourcutalbum.data.model
 import java.io.Serializable
 
 import android.net.Uri
+import androidx.annotation.NonNull
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -12,9 +14,10 @@ data class FourCuts(
     val friends: List<String>?,
     val place: String?,
     val comment: String?,
-//    val public_yn: Char,
-//    val people: String?,
-//    val hashtag: List<String>?
+    @ColumnInfo(defaultValue = "N") @NonNull
+    val public_yn: String,
+    val people: Int?,
+    val hashtag: List<String>?
 ): Serializable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 }

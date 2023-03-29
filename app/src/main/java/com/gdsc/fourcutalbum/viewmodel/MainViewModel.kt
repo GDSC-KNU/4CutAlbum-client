@@ -47,7 +47,7 @@ class MainViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     fun getFourCutsWithId(id: Int): StateFlow<FourCuts> {
-        return fourCutsRepository.getFourCutsWithId(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FourCuts("", Uri.EMPTY, listOf(),"",""))
+        return fourCutsRepository.getFourCutsWithId(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FourCuts("", Uri.EMPTY, listOf(),"","", "N", 1, listOf()))
     }
 
     fun searchFourCuts(searchWord: String): StateFlow<List<FourCuts>> {

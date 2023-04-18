@@ -196,26 +196,33 @@ class SocialFragment : Fragment() {
         }
     }
 
+    // Social Fragment에서는 별도의 검색방법 진행
+//    fun setSearch(){
+//        binding.socialSearchBtn.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+//            override fun onQueryTextSubmit(query: String?): Boolean {
+//                // 검색 버튼 누를 때
+//                return true
+//            }
+//
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                // 검색창에서 글자가 변경이 일어날 때마다 호출
+//                newText?.let {
+//                    if (it == "") {
+//                        setRecyclerView("")
+//                        Log.d("DBG::SEARCH", "GET_ALL")
+//                    } else {
+//                        setRecyclerView(it)
+//                    }
+//                }
+//                return true
+//            }
+//        })
+//    }
     fun setSearch(){
-        binding.socialSearchBtn.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // 검색 버튼 누를 때
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // 검색창에서 글자가 변경이 일어날 때마다 호출
-                newText?.let {
-                    if (it == "") {
-                        setRecyclerView("")
-                        Log.d("DBG::SEARCH", "GET_ALL")
-                    } else {
-                        setRecyclerView(it)
-                    }
-                }
-                return true
-            }
-        })
+        binding.socialSearchBtn.setOnClickListener {
+            val dialogFragment = BottomSheetFragment()
+            dialogFragment.show(childFragmentManager, "BottomSheetDialogFragment")
+        }
     }
 
     private fun signIn() {

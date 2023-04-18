@@ -49,9 +49,10 @@ class EditActivity : AppCompatActivity() {
 
     lateinit var fourCutsViewModel: FourCutsViewModel
     private var imageUri: Uri = Uri.EMPTY
-    lateinit var studio: String // for Spinner
-    lateinit var people: String // for Spinner
+    private var studio: String? = null // for Spinner
+    private var people: String? = null // for Spinner
     private var public_yn : String = "N"
+    private var util = Util()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,8 +100,8 @@ class EditActivity : AppCompatActivity() {
         }
 
         binding.editSaveButton.setOnClickListener {
-            val chipList = makeChipList(binding.editFriendGroup)
-            val hashtagList = makeChipList(binding.editHashtagGroup)
+            val chipList = util.makeChipList(binding.editFriendGroup)
+            val hashtagList = util.makeChipList(binding.editHashtagGroup)
             if (imageUri == Uri.EMPTY)
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
             else {
@@ -112,7 +113,7 @@ class EditActivity : AppCompatActivity() {
                         studio,
                         binding.editComment.text.toString(),
                         public_yn,
-                        Util().peopleToValue(people),
+                        people?.let { it1 -> util.peopleToValue(it1) },
                         hashtagList
                     )
                 if (id > 0) fourCutsViewModel.updateFourCuts(
@@ -135,12 +136,7 @@ class EditActivity : AppCompatActivity() {
 
     private fun initStudioSpinner() {
         val spinner : Spinner = binding.editStudioSpinner
-        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,
-            R.array.studio,
-            R.layout.item_spinner_transparent
-        );
-        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
-        spinner.adapter = spinnerAdapter
+        util.makeSpinner(spinner, R.array.studio, this)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 studio = parent.getItemAtPosition(position).toString()
@@ -149,20 +145,12 @@ class EditActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {
 
             }
-
         }
-
-
     }
 
     private fun initPeopleSpinner() {
         val spinner : Spinner = binding.editPeopleSpinner
-        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,
-            R.array.people,
-            R.layout.item_spinner_transparent
-        );
-        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
-        spinner.adapter = spinnerAdapter
+        util.makeSpinner(spinner, R.array.people, this)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 people = parent.getItemAtPosition(position).toString()
@@ -201,8 +189,8 @@ class EditActivity : AppCompatActivity() {
                         binding.editFriendGroup.removeView(binding.editFriendGroup.getChildAt(0) as Chip)
 
                     }
-                    for (friend: String in friends!!) binding.editFriendGroup.addView(makeChip(
-                        friend, binding.editFriendGroup))
+                    for (friend: String in friends!!) binding.editFriendGroup.addView(util.makeChip(
+                        friend, binding.editFriendGroup, this@EditActivity))
 
                     val cnt2 = binding.editHashtagGroup.childCount
                     for (i: Int in 1..cnt2) { // clear
@@ -211,10 +199,9 @@ class EditActivity : AppCompatActivity() {
                     }
                     if(!hashtag.isNullOrEmpty()) { // 기존 데이터 대비
                         for (tag: String in hashtag!!) binding.editHashtagGroup
-                            .addView(makeChip(tag, binding.editHashtagGroup)
+                            .addView(util.makeChip(tag, binding.editHashtagGroup, this@EditActivity)
                         )
                     }
-
 
                     Glide.with(binding.root.context).load(it.photo)
                         .override(Target.SIZE_ORIGINAL)
@@ -224,32 +211,6 @@ class EditActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun makeChipList(group: ChipGroup): ArrayList<String> {
-        val chipList = ArrayList<String>()
-        for (i: Int in 1..group.childCount) {
-            val chip: Chip = group.getChildAt(i - 1) as Chip
-            chipList.add(chip.text.toString())
-        }
-        return chipList
-    }
-
-    private fun makeChip(str: String, group: ChipGroup): Chip {
-        val chip = Chip(this)
-        chip.apply {
-            text = str
-            isCloseIconVisible = true
-            setOnCloseIconClickListener { group.removeView(this) }
-            setCloseIconSize(30f)
-            setCloseIconTintResource(R.color.main_color)
-            chipStrokeWidth = 2.5f
-            setTextAppearance(R.style.chipText)
-            setChipMinHeight(100f)
-            setChipBackgroundColorResource(R.color.white)
-            setChipStrokeColorResource(R.color.gray)
-        }
-        return chip
     }
 
     private fun makeDialog(group: ChipGroup) {
@@ -276,7 +237,7 @@ class EditActivity : AppCompatActivity() {
                 if (string.isEmpty()) {
                     Toast.makeText(this, "chip 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
                 } else {
-                    group.addView(makeChip(string, group))
+                    group.addView(util.makeChip(string, group, this))
                 }
             }
             .setNegativeButton("취소") { dialog, which ->
@@ -286,15 +247,9 @@ class EditActivity : AppCompatActivity() {
 
     private fun makeDialog2(group: ChipGroup) { // Dialog - Spinner
         val sp = Spinner(this)
-        var hashtag : String = ""
+        var hashtag : String? = ""
         sp.setBackgroundResource(R.drawable.spinner)
-        val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(this,
-            R.array.hashtag,
-            R.layout.item_spinner_transparent
-        );
-        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
-
-        sp.adapter = spinnerAdapter
+        util.makeSpinner(sp, R.array.hashtag, this)
         sp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 hashtag = parent.getItemAtPosition(position).toString()
@@ -304,6 +259,7 @@ class EditActivity : AppCompatActivity() {
 
             }
         }
+        Log.d("hashtag::", hashtag.toString())
         val container = FrameLayout(this)
         val params = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -320,10 +276,10 @@ class EditActivity : AppCompatActivity() {
             .setView(container)
             .setPositiveButton("추가") { dialog, which ->
                 val string = hashtag
-                if (string.isEmpty()) {
+                if (string!!.isEmpty()) {
                     Toast.makeText(this, "해시태그를 선택해주세요", Toast.LENGTH_SHORT).show()
                 } else {
-                    group.addView(makeChip(string, group))
+                    group.addView(util.makeChip(string, group, this))
                 }
             }
             .setNegativeButton("취소") { dialog, which ->

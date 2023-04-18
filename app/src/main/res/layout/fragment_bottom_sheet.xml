@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="20dp"
+    android:background="@drawable/top_radius_30"
+    android:elevation="-10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="10dp"
+        android:background="@color/white">
+
+        <LinearLayout
+            android:id="@+id/bar"
+            android:paddingBottom="25dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <View
+                android:layout_width="200dp"
+                android:layout_height="3dp"
+                android:background="@drawable/search_button_bg"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/searchPeopleDes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="인원수"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textFontWeight="900"
+            android:textSize="15sp"
+            app:layout_constraintTop_toBottomOf="@+id/bar"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <Spinner
+            android:id="@+id/searchPeopleSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_margin="10dp"
+            android:spinnerMode="dropdown"
+            android:background="@drawable/spinner"
+            android:popupBackground="@drawable/spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchPeopleDes"/>
+
+        <TextView
+            android:id="@+id/searchStudioDes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="스튜디오"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textFontWeight="900"
+            android:textSize="15sp"
+            app:layout_constraintTop_toBottomOf="@+id/searchPeopleSpinner"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <Spinner
+            android:id="@+id/searchStudioSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_margin="10dp"
+            android:spinnerMode="dropdown"
+            android:background="@drawable/spinner"
+            android:popupBackground="@drawable/spinner"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchStudioDes"/>
+
+        <TextView
+            android:id="@+id/searchHashtagDes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginHorizontal="10dp"
+            android:text="해시태그"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textFontWeight="900"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/searchStudioSpinner" />
+
+        <LinearLayout
+            android:id="@+id/searchHashtagLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/searchHashtagDes">
+
+            <Spinner
+                android:id="@+id/searchHashtagSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_margin="10dp"
+                android:spinnerMode="dropdown"
+                android:background="@drawable/spinner"
+                android:popupBackground="@drawable/spinner"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/searchHashtagDes"/>
+
+            <HorizontalScrollView
+                android:layout_weight="10"
+                android:layout_marginHorizontal="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/searchHashtagGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp" />
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/searchLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical|center_horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchHashtagLayout"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/options"/>
+            <TextView
+                android:id="@+id/reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:text=" 재설정"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:textFontWeight="900"
+                android:textStyle="bold"/>
+
+            <android.widget.Button
+                android:id="@+id/searchBtn"
+                android:text="검색"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:background="@drawable/search_button_bg"
+                android:textColor="@color/white"
+                android:textFontWeight="900"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

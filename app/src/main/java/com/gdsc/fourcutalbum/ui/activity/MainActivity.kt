@@ -2,7 +2,6 @@ package com.gdsc.fourcutalbum.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.gdsc.fourcutalbum.databinding.ActivityMainBinding
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -10,6 +9,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
+import com.gdsc.fourcutalbum.databinding.ActivityMainBinding
 import com.gdsc.fourcutalbum.viewmodel.MainViewModel
 import com.gdsc.fourcutalbum.viewmodel.MainViewModelProviderFactory
 

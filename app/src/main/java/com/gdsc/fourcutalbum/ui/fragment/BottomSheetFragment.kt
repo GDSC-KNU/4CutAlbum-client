@@ -11,6 +11,7 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.core.view.isEmpty
 import com.gdsc.fourcutalbum.R
+import com.gdsc.fourcutalbum.service.OnDataSelectedListener
 import com.gdsc.fourcutalbum.databinding.FragmentBottomSheetBinding
 import com.gdsc.fourcutalbum.util.Util
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -19,6 +20,8 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
+    private var listener: OnDataSelectedListener? = null
+
     private var _binding: FragmentBottomSheetBinding? = null
     private val binding get() = _binding!!
     lateinit var context_: Context
@@ -41,6 +44,24 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         initSearchHashtagSpinner()
 
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try {
+            listener = parentFragment as OnDataSelectedListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement OnDataSelectedListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
+
+    fun sendData(people: Int, studio: String, hashtags: ArrayList<String>) {
+        listener?.onDataSelected(people, studio, hashtags)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,6 +92,9 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
             Log.d("params:::", peopleValue.toString())
             Log.d("params:::", studio.toString())
             Log.d("params:::", hashtagsList.toString())
+
+            sendData(peopleValue, studio, hashtags as ArrayList<String>)
+            dismiss()
         }
 
     }
@@ -163,4 +187,5 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         hashtags = hashtagList
 
     }
+
 }

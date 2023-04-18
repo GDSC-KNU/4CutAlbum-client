@@ -24,6 +24,7 @@ import com.gdsc.fourcutalbum.data.model.FeedList
 import com.gdsc.fourcutalbum.data.model.SignupResponseModel
 import com.gdsc.fourcutalbum.databinding.FragmentSocialBinding
 import com.gdsc.fourcutalbum.service.HttpService
+import com.gdsc.fourcutalbum.service.OnDataSelectedListener
 import com.gdsc.fourcutalbum.ui.activity.RegisterActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -36,7 +37,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class SocialFragment : Fragment() {
+class SocialFragment : Fragment(), OnDataSelectedListener {
 
     private var _binding: FragmentSocialBinding? = null
     private val binding get() = _binding!!
@@ -306,7 +307,9 @@ class SocialFragment : Fragment() {
 
     }
 
-
+    override fun onDataSelected(people: Int, studio: String, hashtags: ArrayList<String>) {
+        Toast.makeText(binding.root.context, "$people $studio ${hashtags.toString()}", Toast.LENGTH_SHORT).show()
+    }
 
 
 }

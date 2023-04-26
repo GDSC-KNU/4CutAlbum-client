@@ -146,7 +146,7 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
                             Toast.makeText(context_, "환영합니다!", Toast.LENGTH_SHORT).show()
                             binding.viewLogin.visibility = View.GONE
 
-                            getFeedData("", 0, arrayListOf(), 0)   // 로그인 성공 시 리스트 생성
+                            getFeedData("", 2, arrayListOf(), 0)   // 로그인 성공 시 리스트 생성
 
                         } else{ // 회원이 존재하지 않으면 false 전달
                             Toast.makeText(context_, "처음이시네요, 닉네임을 설정해 주세요!", Toast.LENGTH_SHORT).show()
@@ -267,8 +267,15 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
 
     fun getFeedData(query:String, people_count: Int, hashtags: ArrayList<String>, page_number: Int){
         try {
+            /* TODO :: 사람수, 해시태그, 페이지넘버 별로 백엔드에서 어떻게 필터링하는지 회의 필요
+             * 현재 people count 전체보기는 어떻게 하는지? 지금은 0으로 하면 안나옴
+             */
+            var hashtags_ = ""
+            if (!hashtags.isEmpty()){
+                hashtags_ = hashtags.joinToString(", ")
+            }
 
-            val data =  HttpService.create(Constants.SERVER_URL).getFeedList(query, 2, "test1,test2", 0)
+            val data =  HttpService.create(Constants.SERVER_URL).getFeedList(query, people_count, hashtags_, page_number)
             var `res` : FeedList? = null
             Log.d("DBG:RETRO", "SENDED")
 

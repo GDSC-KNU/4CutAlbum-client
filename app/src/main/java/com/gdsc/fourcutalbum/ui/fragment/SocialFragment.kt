@@ -146,7 +146,7 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
                             Toast.makeText(context_, "환영합니다!", Toast.LENGTH_SHORT).show()
                             binding.viewLogin.visibility = View.GONE
 
-                            getFeedData("", 2, arrayListOf(), 0)   // 로그인 성공 시 리스트 생성
+                            getFeedData("", 0, arrayListOf(), 0)   // 로그인 성공 시 리스트 생성
 
                         } else{ // 회원이 존재하지 않으면 false 전달
                             Toast.makeText(context_, "처음이시네요, 닉네임을 설정해 주세요!", Toast.LENGTH_SHORT).show()
@@ -318,8 +318,9 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
     override fun onDataSelected(people: Int, studio: String, hashtags: ArrayList<String>) {
         Toast.makeText(binding.root.context, "$people $studio ${hashtags.toString()}", Toast.LENGTH_SHORT).show()
         var studioQuery = studio
+        var peopleQuery = people
         if (studioQuery == "전체") studioQuery = ""
-        getFeedData(studioQuery, people, hashtags, 0)   // 로그인 성공 시 리스트 생성
+        getFeedData(studioQuery, peopleQuery, hashtags, 0)   // 로그인 성공 시 리스트 생성
 
 
     }

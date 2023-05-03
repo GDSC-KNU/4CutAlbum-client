@@ -138,12 +138,12 @@ class EditActivity : AppCompatActivity() {
                             // TODO ::: UID 받아오기, Image 코드 넣기
                             // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
                             val model = CreateFeedRequestModel("1",
-                                "data:image/jpeg;base64,$base64Image", "test.jpeg",
+                                base64Image, "test.jpeg",
                             hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
                             Log.d("Model.image:::", model.image)
                             val data =  HttpService.create(Constants.SERVER_URL).createFeed(model)
                             var url : CreateFeedResponseModel? = null
-                            Log.d("DBG:RETRO", "SENDED")
+                            Log.d("DBG:RETRO", "SENDED ${model.toString()}")
 
                             data.enqueue(object : Callback<CreateFeedResponseModel?> {
                                 override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {

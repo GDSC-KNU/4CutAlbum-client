@@ -32,6 +32,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.magical.near.common.util.SharedManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -141,6 +142,11 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
                 override fun onResponse(call: Call<SignupResponseModel?>, response: Response<SignupResponseModel?>) {
                     if (response.isSuccessful() && response.body() != null) {
                         Log.d("DBG:RETRO", "response : " + response.body().toString())
+
+                        // 로그인 성공 응답시에 내부 저장소에 UID 및 아이디 기록
+                        SharedManager.init(context_)
+                        SharedManager.write(SharedManager.AUTH_TOKEN, UID)
+                        SharedManager.write(SharedManager.LOGIN_ID, EMAIL)
 
                         if(response.body()!!.data){
                             Toast.makeText(context_, "환영합니다!", Toast.LENGTH_SHORT).show()

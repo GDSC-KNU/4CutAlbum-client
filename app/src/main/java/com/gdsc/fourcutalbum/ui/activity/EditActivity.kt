@@ -50,6 +50,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
+import com.magical.near.common.util.SharedManager
 import kotlinx.coroutines.flow.collectLatest
 import retrofit2.Call
 import retrofit2.Callback
@@ -137,7 +138,11 @@ class EditActivity : AppCompatActivity() {
                         try {
                             // TODO ::: UID 받아오기, Image 코드 넣기
                             // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
-                            val model = CreateFeedRequestModel("1",
+
+                            // TODO ::: GLACIER -> 로그인시에 UID와 Email을 SharedPreference에 저장하여 사용하는 방식은 어떤지? 일단 적용해놨습니다
+                            SharedManager.init(applicationContext)
+                            val uid = SharedManager.read(SharedManager.LOGIN_ID, "1")!!
+                            val model = CreateFeedRequestModel(uid,
                                 base64Image, "test.jpeg",
                             hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
                             Log.d("Model.image:::", model.image)

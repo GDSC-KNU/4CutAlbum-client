@@ -1,10 +1,7 @@
 package com.gdsc.fourcutalbum.service
 
 import com.gdsc.fourcutalbum.common.Constants
-import com.gdsc.fourcutalbum.data.model.FeedDetail
-import com.gdsc.fourcutalbum.data.model.FeedList
-import com.gdsc.fourcutalbum.data.model.SignupRequestModel
-import com.gdsc.fourcutalbum.data.model.SignupResponseModel
+import com.gdsc.fourcutalbum.data.model.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import retrofit2.Call
@@ -34,7 +31,6 @@ interface HttpService {
         @Body jsonParam: SignupRequestModel
     ): Call<SignupResponseModel>
 
-
     @GET(Constants.FEEDS) // 요청 메소드: GET(파라미터들이 URL에 추가됨), baseUrl에 연결될 Endpoint
     @Headers("accept: application/json","charset:utf-8")
     fun getFeedList(
@@ -43,6 +39,12 @@ interface HttpService {
         @Query("hashtags") hashtag : String,
         @Query("page-number") page_number : Int
     ): Call<FeedList> // Call: 응답이 왔을 때 Callback으로 불려질 타입
+
+    @POST(Constants.CREATE_FEED)
+    @Headers("accept: application/json","charset:utf-8")
+    fun createFeed(
+        @Body jsonParam: CreateFeedRequestModel
+    ): Call<CreateFeedResponseModel>
 
 
     companion object {

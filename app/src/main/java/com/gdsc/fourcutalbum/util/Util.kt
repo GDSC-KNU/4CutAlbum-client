@@ -1,6 +1,8 @@
 package com.gdsc.fourcutalbum.util
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -9,6 +11,7 @@ import android.widget.Spinner
 import com.gdsc.fourcutalbum.R
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import java.io.ByteArrayOutputStream
 
 class Util {
     fun peopleToValue(people: String) : Int{
@@ -24,7 +27,6 @@ class Util {
 
     fun makeSpinner(spinner : Spinner, array: Int, context : Context){ // 스피너 뷰, 배열 ID, Context
 //        val spinner : Spinner = binding.searchStudioSpinner
-        Log.d("context in spinner:::", context.toString())
         val spinnerAdapter : ArrayAdapter<CharSequence> = ArrayAdapter.createFromResource(context,
             array,
             R.layout.item_spinner_transparent
@@ -57,5 +59,13 @@ class Util {
             setChipStrokeColorResource(R.color.gray)
         }
         return chip
+    }
+
+    fun bitmapToBase64(bitmap: Bitmap?) : String{
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.NO_WRAP)
     }
 }

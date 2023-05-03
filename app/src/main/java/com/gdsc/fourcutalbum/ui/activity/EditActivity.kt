@@ -2,14 +2,20 @@ package com.gdsc.fourcutalbum.ui.activity
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.graphics.Rect
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
 import android.util.Log
@@ -25,21 +31,30 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.gdsc.fourcutalbum.R
+import com.gdsc.fourcutalbum.common.Constants
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
-import com.gdsc.fourcutalbum.data.model.FourCuts
+import com.gdsc.fourcutalbum.data.model.*
 import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
 import com.gdsc.fourcutalbum.databinding.ActivityEditBinding
+import com.gdsc.fourcutalbum.service.HttpService
 import com.gdsc.fourcutalbum.util.Util
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModel
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModelProviderFactory
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.IOException
 
 
 class EditActivity : AppCompatActivity() {
@@ -48,15 +63,18 @@ class EditActivity : AppCompatActivity() {
     }
 
     lateinit var fourCutsViewModel: FourCutsViewModel
+    lateinit var context_: Context
     private var imageUri: Uri = Uri.EMPTY
     private var studio: String? = null // for Spinner
     private var people: String? = null // for Spinner
     private var public_yn : String = "N"
     private var util = Util()
+    lateinit var base64Image : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        context_ = applicationContext
 
         val database = FourCutsDatabase.getInstance(this)
         val fourCutsRepository = FourCutsRepositoryImpl(database)
@@ -102,9 +120,65 @@ class EditActivity : AppCompatActivity() {
         binding.editSaveButton.setOnClickListener {
             val chipList = util.makeChipList(binding.editFriendGroup)
             val hashtagList = util.makeChipList(binding.editHashtagGroup)
+            var isSuccessCreateFeed = true
             if (imageUri == Uri.EMPTY)
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
-            else {
+            else { // 사진이 있는 경우 저장 진행
+                if(public_yn.equals("Y")){
+                    // 전체공개 하는 경우 - 로그인 체크
+//                    val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this)
+//                    if(account==null){
+//                        // 로그인 되어있지 않은 경우
+//                        // dialog --> 로그인이 필요합니다. 로그인 하시겠습니까?
+//                        // N -> 그냥 dialog 닫기, 저장 진행 x
+//                        // Y -> 회원가입 여부 확인 --> 회원가입 분기처리
+//                    }else{
+                        // 로그인 되어 있는 경우 - 피드 생성 요청
+                        try {
+                            // TODO ::: UID 받아오기, Image 코드 넣기
+                            // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
+                            val model = CreateFeedRequestModel("1",
+                                "data:image/jpeg;base64,$base64Image", "test.jpeg",
+                            hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
+                            Log.d("Model.image:::", model.image)
+                            val data =  HttpService.create(Constants.SERVER_URL).createFeed(model)
+                            var url : CreateFeedResponseModel? = null
+                            Log.d("DBG:RETRO", "SENDED")
+
+                            data.enqueue(object : Callback<CreateFeedResponseModel?> {
+                                override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Log.d("DBG:RETRO", "response success: " + response.body().toString())
+                                        url = response.body()
+
+                                    }else{
+                                        Log.d("DBG:RETRO", "response else: " + response.toString())
+                                    }
+                                }
+                                override fun onFailure(call: Call<CreateFeedResponseModel?>, t: Throwable) {
+                                    t.printStackTrace()
+                                    isSuccessCreateFeed = false
+                                }
+                            })
+
+                        } catch (e:Exception){
+                            e.printStackTrace()
+                            isSuccessCreateFeed = false
+                            Toast.makeText(context_,"서버와 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_LONG).show()
+                        }
+
+ //                   }
+
+                }
+
+                // 서버 저장 실패시 전체 여부를 N으로 하고 나만보기로 저장
+                if(public_yn.equals("Y")&&!isSuccessCreateFeed){
+                    // 전체공개인데 서버 전송 실패
+                    Toast.makeText(this, "서버 전송에 실패하였습니다. 나만 보기로 저장됩니다.", Toast.LENGTH_SHORT).show()
+                    public_yn="N"
+                }
+
+                // 전체 공개 여부 관련없이 Room DB저장
                 val fourCuts =
                     FourCuts(
                         binding.editTitle.text.toString(),
@@ -127,6 +201,8 @@ class EditActivity : AppCompatActivity() {
                     fourCuts.hashtag,
                     id)
                 else fourCutsViewModel.saveFourCuts(fourCuts)
+
+
                 finish()
             }
 
@@ -170,7 +246,6 @@ class EditActivity : AppCompatActivity() {
 
         lifecycleScope.launchWhenCreated {
             fourCuts.collectLatest {
-                Log.d("EDIT_TEST", it.toString())
                 it.apply {
                     for(x : String in resources.getStringArray(R.array.studio)){
                         if(place.equals(x))
@@ -206,8 +281,24 @@ class EditActivity : AppCompatActivity() {
                     Glide.with(binding.root.context).load(it.photo)
                         .override(Target.SIZE_ORIGINAL)
                         .into(binding.imageIv)
+
                     binding.imageIv.background = null
                     imageUri = it.photo
+
+                    // 이미지 uri를 bitmap으로 변경한다.
+                    var bitmap : Bitmap? = null
+                    try{
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                            bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context_.contentResolver, imageUri))
+                            Log.d("bitmap:::", bitmap.toString())
+                        }else{ // API 29 이하
+                            bitmap = MediaStore.Images.Media.getBitmap(context_.contentResolver, imageUri)
+                        }
+                    }catch(e : IOException){
+                        e.printStackTrace()
+                    }
+                    // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
+                    base64Image = util.bitmapToBase64(bitmap)
                 }
             }
         }
@@ -343,6 +434,7 @@ class EditActivity : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {
+            var bitmap : Bitmap? = null
             // 이미지를 받으면 ImageView에 적용한다
             val temp = result.data?.data
             if (temp != null) {
@@ -355,7 +447,20 @@ class EditActivity : AppCompatActivity() {
                     .fitCenter()
                     .apply(RequestOptions().override(500, 500))
                     .into(binding.imageIv)
+                // 이미지 uri를 bitmap으로 변경한다.
+                try{
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                        bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context_.contentResolver, it))
+                    }else{ // API 28 미만
+                        bitmap = MediaStore.Images.Media.getBitmap(context_.contentResolver, it)
+                    }
+                }catch(e : IOException){
+                    e.printStackTrace()
+                }
+
             }
+            // bitmap이미지를 서버 전송을 위한 base64로 인코딩한다.
+            base64Image = util.bitmapToBase64(bitmap)
             binding.imageIv.background = null
         }
     }

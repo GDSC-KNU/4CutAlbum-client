@@ -137,11 +137,11 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         fun makeChip(str: String, group: ChipGroup, context: Context): Chip {
             val chip = Chip(context)
             chip.apply {
-                text = str
+                text = "# " + str
                 isCloseIconVisible = true
                 setOnCloseIconClickListener {
                     group.removeView(this)
-                    hashtagList.remove(text) // 검색 파라미터에서 삭제
+                    hashtagList.remove(str) // 검색 파라미터에서 삭제
                     if(hashtags.isEmpty()) binding.searchHashtagSpinner.setSelection(0)
                 }
                 setCloseIconSize(30f)

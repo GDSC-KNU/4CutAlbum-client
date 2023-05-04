@@ -76,6 +76,7 @@ class EditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         context_ = applicationContext
+        SharedManager.init(applicationContext)
 
         val database = FourCutsDatabase.getInstance(this)
         val fourCutsRepository = FourCutsRepositoryImpl(database)
@@ -125,63 +126,6 @@ class EditActivity : AppCompatActivity() {
             if (imageUri == Uri.EMPTY)
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
             else { // 사진이 있는 경우 저장 진행
-                if(public_yn.equals("Y")){
-                    // 전체공개 하는 경우 - 로그인 체크
-//                    val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this)
-//                    if(account==null){
-//                        // 로그인 되어있지 않은 경우
-//                        // dialog --> 로그인이 필요합니다. 로그인 하시겠습니까?
-//                        // N -> 그냥 dialog 닫기, 저장 진행 x
-//                        // Y -> 회원가입 여부 확인 --> 회원가입 분기처리
-//                    }else{
-                        // 로그인 되어 있는 경우 - 피드 생성 요청
-                        try {
-                            // TODO ::: UID 받아오기, Image 코드 넣기
-                            // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
-
-                            // TODO ::: GLACIER -> 로그인시에 UID와 Email을 SharedPreference에 저장하여 사용하는 방식은 어떤지? 일단 적용해놨습니다
-                            SharedManager.init(applicationContext)
-                            val uid = SharedManager.read(SharedManager.LOGIN_ID, "1")!!
-                            val model = CreateFeedRequestModel(uid,
-                                base64Image, "test.jpeg",
-                            hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
-                            Log.d("Model.image:::", model.image)
-                            val data =  HttpService.create(Constants.SERVER_URL).createFeed(model)
-                            var url : CreateFeedResponseModel? = null
-                            Log.d("DBG:RETRO", "SENDED ${model.toString()}")
-
-                            data.enqueue(object : Callback<CreateFeedResponseModel?> {
-                                override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {
-                                    if (response.isSuccessful() && response.body() != null) {
-                                        Log.d("DBG:RETRO", "response success: " + response.body().toString())
-                                        url = response.body()
-
-                                    }else{
-                                        Log.d("DBG:RETRO", "response else: " + response.toString())
-                                    }
-                                }
-                                override fun onFailure(call: Call<CreateFeedResponseModel?>, t: Throwable) {
-                                    t.printStackTrace()
-                                    isSuccessCreateFeed = false
-                                }
-                            })
-
-                        } catch (e:Exception){
-                            e.printStackTrace()
-                            isSuccessCreateFeed = false
-                            Toast.makeText(context_,"서버와 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_LONG).show()
-                        }
-
- //                   }
-
-                }
-
-                // 서버 저장 실패시 전체 여부를 N으로 하고 나만보기로 저장
-                if(public_yn.equals("Y")&&!isSuccessCreateFeed){
-                    // 전체공개인데 서버 전송 실패
-                    Toast.makeText(this, "서버 전송에 실패하였습니다. 나만 보기로 저장됩니다.", Toast.LENGTH_SHORT).show()
-                    public_yn="N"
-                }
 
                 // 전체 공개 여부 관련없이 Room DB저장
                 val fourCuts =
@@ -207,8 +151,75 @@ class EditActivity : AppCompatActivity() {
                     id)
                 else fourCutsViewModel.saveFourCuts(fourCuts)
 
+                if(public_yn.equals("Y")){
+                    // 전체공개 하는 경우 - 로그인 체크
+                    val loginUID = SharedManager.read(SharedManager.LOGIN_ID, "1")!!
+                    if(loginUID == "1"){
+                        // 로그인 되어있지 않은 경우
+                        // dialog --> 로그인이 필요합니다. 로그인 하시겠습니까?
+                        // N -> 그냥 dialog 닫기, 저장 진행 x
+                        val builder = AlertDialog.Builder(binding.root.context)
+                        builder.setTitle("로그인이 필요합니다.")
+                        builder.setMessage("로그인 하시겠습니까?")
+                        builder.setPositiveButton("예") { dialog, which ->
+                            //login
+                            finish()
+                            Toast.makeText(applicationContext, "둘러보기 탭을 클릭하여 로그인을 해주세요!", Toast.LENGTH_SHORT).show()
+                        }
+                        builder.setNegativeButton("아니오") { _, _ -> }
+                        builder.show()
 
-                finish()
+                    }else{
+                        // 로그인 되어 있는 경우 - 피드 생성 요청
+                        try {
+                            // TODO ::: UID 받아오기, Image 코드 넣기
+                            // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
+
+                            // TODO ::: GLACIER -> 로그인시에 UID와 Email을 SharedPreference에 저장하여 사용하는 방식은 어떤지? 일단 적용해놨습니다
+                            val model = CreateFeedRequestModel(loginUID,
+                                base64Image, "test.jpeg",
+                            hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
+                            Log.d("Model.image:::", model.image)
+                            val data =  HttpService.create(Constants.SERVER_URL).createFeed(model)
+                            var url : CreateFeedResponseModel? = null
+                            Log.d("DBG:RETRO", "SENDED ${model.toString()}")
+
+                            data.enqueue(object : Callback<CreateFeedResponseModel?> {
+                                override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {
+                                    if (response.isSuccessful() && response.body() != null) {
+                                        Log.d("DBG:RETRO", "response success: " + response.body().toString())
+                                        url = response.body()
+
+                                    }else{
+                                        Log.d("DBG:RETRO", "response else: " + response.toString())
+                                    }
+                                    finish()
+                                }
+                                override fun onFailure(call: Call<CreateFeedResponseModel?>, t: Throwable) {
+                                    t.printStackTrace()
+                                    isSuccessCreateFeed = false
+                                }
+                            })
+
+                        } catch (e:Exception){
+                            e.printStackTrace()
+                            isSuccessCreateFeed = false
+                            Toast.makeText(context_,"서버와 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_LONG).show()
+                        }
+
+                    }
+
+                }
+
+                // 서버 저장 실패시 전체 여부를 N으로 하고 나만보기로 저장
+                if(public_yn.equals("Y")&&!isSuccessCreateFeed){
+                    // 전체공개인데 서버 전송 실패
+                    Toast.makeText(this, "서버 전송에 실패하였습니다. 나만 보기로 저장됩니다.", Toast.LENGTH_SHORT).show()
+                    public_yn="N"
+                    finish()
+                }
+
+
             }
 
         }

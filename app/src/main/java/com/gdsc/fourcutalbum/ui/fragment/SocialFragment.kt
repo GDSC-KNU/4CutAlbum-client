@@ -51,11 +51,7 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
     lateinit var mGoogleSignInClient: GoogleSignInClient
     lateinit var resultLauncher: ActivityResultLauncher<Intent>
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentSocialBinding.inflate(inflater, container, false)
         context?.let { context_ = it }
         isLogined = getLoginState()

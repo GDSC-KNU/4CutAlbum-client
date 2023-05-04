@@ -32,11 +32,15 @@ class MainActivity : AppCompatActivity() {
 //        var intent : Intent = Intent(MainActivity@this, TestActivity::class.java)
 //        startActivity(intent)
 
+
         val database = FourCutsDatabase.getInstance(this)
         val fourCutsRepository = FourCutsRepositoryImpl(database)
 
         val factory = MainViewModelProviderFactory(fourCutsRepository)
         mainViewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
+
+        if(intent.getStringExtra("MODE") == "LOGIN") setLoginState()
+
     }
 
     private fun setupJetpackNavigation() {
@@ -46,6 +50,10 @@ class MainActivity : AppCompatActivity() {
         navController = host.navController
         // 내비게이션 뷰를 내비게이션 컨트롤러와 연결
         binding.bottomNavigationView.setupWithNavController(navController)
+    }
+
+    fun setLoginState(){
+        navController.navigate(R.id.fragment_social)
     }
 
 }

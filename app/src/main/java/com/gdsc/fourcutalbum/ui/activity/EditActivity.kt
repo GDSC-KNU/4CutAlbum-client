@@ -179,6 +179,15 @@ class EditActivity : AppCompatActivity() {
                             val model = CreateFeedRequestModel(loginUID,
                                 base64Image, "test.jpeg",
                             hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
+
+                            Log.d("DBG::COMPANY", "${model.company}")
+                            Log.d("DBG::IMAGE", "${model.image}")
+                            Log.d("DBG::IMAGENAME", "${model.image_name}")
+                            Log.d("DBG::UID", "${model.uid}")
+                            Log.d("DBG::PEOPLECOUNT", "${model.people_count}")
+                            Log.d("DBG::COMMENT", "${model.comment}")
+                            Log.d("DBG::HASHTAG", "${model.hashtags}")
+
                             Log.d("Model.image:::", model.image)
                             val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
                             var url : CreateFeedResponseModel? = null

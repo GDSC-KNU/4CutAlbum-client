@@ -54,6 +54,8 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentSocialBinding.inflate(inflater, container, false)
         context?.let { context_ = it }
+        SharedManager.init(context_)
+
         isLogined = getLoginState()
         setLogin()
         setSearch()
@@ -141,7 +143,6 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
                         Log.d("DBG:RETRO", "response : " + response.body().toString())
 
                         // 로그인 성공 응답시에 내부 저장소에 UID 및 아이디 기록
-                        SharedManager.init(context_)
                         SharedManager.write(SharedManager.AUTH_TOKEN, UID)
                         SharedManager.write(SharedManager.LOGIN_ID, EMAIL)
 

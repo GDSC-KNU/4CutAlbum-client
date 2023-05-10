@@ -1,9 +1,9 @@
 package com.gdsc.fourcutalbum.data.model
 /*
 {
-	"url": string
+	"saveFeedId": string
 }
 * */
 data class CreateFeedResponseModel(
-    val url: String
+    val saveFeedId: String
 )

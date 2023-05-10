@@ -12,7 +12,7 @@ import com.gdsc.fourcutalbum.data.model.FourCuts
 
 @Database(
     entities = [FourCuts::class],
-    version = 2, // 왜 올렸는데 안올렸다고 ㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹㅈㄹ
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(OrmConverter::class)
@@ -59,6 +59,30 @@ abstract class FourCutsDatabase : RoomDatabase(){
             }
         }
 
+        private val MIGRATION_2_TO_3: Migration = object : Migration(2,3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.run {
+                    execSQL(
+                        "CREATE TABLE IF NOT EXISTS new_fourcuts (" +
+                                "title TEXT, " +
+                                "photo TEXT NOT NULL, " +
+                                "friends TEXT, " +
+                                "place TEXT, " +
+                                "comment TEXT, " +
+                                "public_yn TEXT NOT NULL DEFAULT 'N', " +
+                                "people INTEGER, " +
+                                "hashtag TEXT, " +
+                                "feed_id TEXT, " +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL) "
+                    );
+                    execSQL("INSERT INTO new_fourcuts (id, title, photo, friends, place, comment, public_yn, people, hashtag) " +
+                            "SELECT id, title, photo, friends, place, comment, public_yn, people, hashtag FROM fourcuts");
+                    execSQL("DROP TABLE fourcuts");
+                    execSQL("ALTER TABLE new_fourcuts RENAME TO fourcuts");
+                }
+            }
+        }
+
 
 
         private fun buildDatabase(context: Context): FourCutsDatabase =
@@ -66,7 +90,7 @@ abstract class FourCutsDatabase : RoomDatabase(){
                 context.applicationContext,
                 FourCutsDatabase::class.java,
                 "my-fourcuts"
-            ).addMigrations(MIGRATION_1_TO_2).build()
+            ).addMigrations(MIGRATION_1_TO_2, MIGRATION_2_TO_3).build()
 
         fun getInstance(context: Context) : FourCutsDatabase =
             INSTANCE ?: synchronized(this){

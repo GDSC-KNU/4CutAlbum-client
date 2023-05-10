@@ -25,8 +25,8 @@ class FourCutsViewModel(
         fourCutsRepository.deleteFourCuts(fourCuts)
     }
 
-    fun updateFourCuts(title: String?, photo: Uri, friends: List<String>?, place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?,id: Int) = viewModelScope.launch(Dispatchers.IO){
-        fourCutsRepository.updateFourCuts(title, photo, friends, place, comment, public_yn, people, hashtag, id)
+    fun updateFourCuts(title: String?, photo: Uri, friends: List<String>?, place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?,feed_id: String?, id: Int) = viewModelScope.launch(Dispatchers.IO){
+        fourCutsRepository.updateFourCuts(title, photo, friends, place, comment, public_yn, people, hashtag, feed_id, id)
     }
 
     // val getFourCuts: Flow<List<FourCuts>> = fourCutsRepository.getFourCuts()
@@ -35,7 +35,7 @@ class FourCutsViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     fun getFourCutsWithId(id: Int): StateFlow<FourCuts> {
-        return fourCutsRepository.getFourCutsWithId(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FourCuts("", Uri.EMPTY, listOf(),"","", "N", 1, listOf()))
+        return fourCutsRepository.getFourCutsWithId(id).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FourCuts("", Uri.EMPTY, listOf(),"","", "N", 1, listOf(), null))
     }
 
     fun getFourCutsWithID(id: Int) : Flow<FourCuts> {

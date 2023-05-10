@@ -18,11 +18,11 @@ interface FourCutsDao {
     fun deleteFourCutsWithId(id: Int)
 
     @Query("UPDATE fourcuts SET title = :title, photo = :photo, friends = :friends, " +
-            "place = :place, comment = :comment, public_yn = :public_yn, people = :people, hashtag = :hashtag" +
+            "place = :place, comment = :comment, public_yn = :public_yn, people = :people, hashtag = :hashtag, feed_id = :feed_id" +
             " WHERE ID LIKE :id")
     suspend fun updateFourCuts(
         title: String?, photo: Uri, friends: List<String>?,
-        place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?, id: Int)
+        place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?, feed_id: String?, id: Int)
 
     @Query("SELECT * FROM fourcuts")
     fun getFourCuts() : Flow<List<FourCuts>>

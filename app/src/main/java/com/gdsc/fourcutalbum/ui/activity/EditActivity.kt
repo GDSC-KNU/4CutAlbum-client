@@ -45,8 +45,6 @@ import com.gdsc.fourcutalbum.service.HttpService
 import com.gdsc.fourcutalbum.util.Util
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModel
 import com.gdsc.fourcutalbum.viewmodel.FourCutsViewModelProviderFactory
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
@@ -69,6 +67,7 @@ class EditActivity : AppCompatActivity() {
     private var studio: String? = null // for Spinner
     private var people: String? = null // for Spinner
     private var public_yn : String = "N"
+    private var save_feed_id : String? = null
     private var util = Util()
     lateinit var base64Image : String
 
@@ -127,30 +126,6 @@ class EditActivity : AppCompatActivity() {
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
             else { // 사진이 있는 경우 저장 진행
 
-                // 전체 공개 여부 관련없이 Room DB저장
-                val fourCuts =
-                    FourCuts(
-                        binding.editTitle.text.toString(),
-                        imageUri,
-                        chipList.toList(),
-                        studio,
-                        binding.editComment.text.toString(),
-                        public_yn,
-                        people?.let { it1 -> util.peopleToValue(it1) },
-                        hashtagList
-                    )
-                if (id > 0) fourCutsViewModel.updateFourCuts(
-                    fourCuts.title,
-                    fourCuts.photo,
-                    fourCuts.friends,
-                    fourCuts.place,
-                    fourCuts.comment,
-                    fourCuts.public_yn,
-                    fourCuts.people,
-                    fourCuts.hashtag,
-                    id)
-                else fourCutsViewModel.saveFourCuts(fourCuts)
-
                 if(public_yn.equals("Y")){
                     // 전체공개 하는 경우 - 로그인 체크
                     val loginUID = SharedManager.read(SharedManager.AUTH_TOKEN, "1")!!
@@ -190,19 +165,20 @@ class EditActivity : AppCompatActivity() {
 
                             Log.d("Model.image:::", model.image)
                             val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
-                            var url : CreateFeedResponseModel? = null
+                            var response_feed_id : CreateFeedResponseModel? = null
                             Log.d("DBG:RETRO", "SENDED ${model.toString()}")
 
                             data.enqueue(object : Callback<CreateFeedResponseModel?> {
                                 override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {
                                     if (response.isSuccessful() && response.body() != null) {
                                         Log.d("DBG:RETRO", "response success: " + response.body().toString())
-                                        url = response.body()
+                                        response_feed_id = response.body()
+                                        save_feed_id = response_feed_id.toString()
 
                                     }else{
                                         Log.d("DBG:RETRO", "response else: " + response.toString())
                                     }
-                                    finish()
+                                    // finish()
                                 }
                                 override fun onFailure(call: Call<CreateFeedResponseModel?>, t: Throwable) {
                                     t.printStackTrace()
@@ -223,12 +199,36 @@ class EditActivity : AppCompatActivity() {
                 // 서버 저장 실패시 전체 여부를 N으로 하고 나만보기로 저장
                 if(public_yn.equals("Y")&&!isSuccessCreateFeed){
                     // 전체공개인데 서버 전송 실패
-                    Toast.makeText(this, "서버 전송에 실패하였습니다. 나만 보기로 저장됩니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "서버 전송에 실패하였습니다. 나만 보기로 저장됩니다.", Toast.LENGTH_SHORT).show()
                     public_yn="N"
-                    finish()
                 }
 
-
+                // 전체 공개 여부 관련없이 Room DB저장
+                val fourCuts =
+                    FourCuts(
+                        binding.editTitle.text.toString(),
+                        imageUri,
+                        chipList.toList(),
+                        studio,
+                        binding.editComment.text.toString(),
+                        public_yn,
+                        people?.let { it1 -> util.peopleToValue(it1) },
+                        hashtagList,
+                        save_feed_id
+                    )
+                if (id > 0) fourCutsViewModel.updateFourCuts(
+                    fourCuts.title,
+                    fourCuts.photo,
+                    fourCuts.friends,
+                    fourCuts.place,
+                    fourCuts.comment,
+                    fourCuts.public_yn,
+                    fourCuts.people,
+                    fourCuts.hashtag,
+                    fourCuts.feed_id,
+                    id)
+                else fourCutsViewModel.saveFourCuts(fourCuts)
+                finish()
             }
 
         }
@@ -309,6 +309,7 @@ class EditActivity : AppCompatActivity() {
 
                     binding.imageIv.background = null
                     imageUri = it.photo
+                    save_feed_id = it.feed_id
 
                     // 이미지 uri를 bitmap으로 변경한다.
                     var bitmap : Bitmap? = null

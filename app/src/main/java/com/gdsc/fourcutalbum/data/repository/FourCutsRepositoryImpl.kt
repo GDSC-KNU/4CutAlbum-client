@@ -20,8 +20,8 @@ class FourCutsRepositoryImpl(
         db.fourCutsDao().deleteFourCutsWithId(id)
     }
 
-    override suspend fun updateFourCuts(title: String?, photo: Uri, friends: List<String>?, place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?, id: Int) {
-        db.fourCutsDao().updateFourCuts(title, photo, friends, place, comment, public_yn, people, hashtag, id)
+    override suspend fun updateFourCuts(title: String?, photo: Uri, friends: List<String>?, place: String?, comment: String?, public_yn: String, people: Int?, hashtag: List<String>?, feed_id: String?, id: Int) {
+        db.fourCutsDao().updateFourCuts(title, photo, friends, place, comment, public_yn, people, hashtag, feed_id, id)
     }
 
     override fun getFourCuts(): Flow<List<FourCuts>> {

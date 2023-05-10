@@ -17,7 +17,8 @@ data class FourCuts(
     @ColumnInfo(defaultValue = "N") @NonNull
     val public_yn: String,
     val people: Int?,
-    val hashtag: List<String>?
+    val hashtag: List<String>?,
+    val feed_id: String?
 ): Serializable {
     @PrimaryKey(autoGenerate = true) var id: Int = 0
 }

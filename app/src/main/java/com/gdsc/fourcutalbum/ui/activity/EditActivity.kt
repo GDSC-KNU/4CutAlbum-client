@@ -176,9 +176,9 @@ class EditActivity : AppCompatActivity() {
                             // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
 
                             // TODO ::: GLACIER -> 로그인시에 UID와 Email을 SharedPreference에 저장하여 사용하는 방식은 어떤지? 일단 적용해놨습니다
-                            val model = CreateFeedRequestModel(loginUID,
+                            val model = CreateFeedRequestModel("1",
                                 base64Image, "test.jpeg",
-                            hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
+                            arrayListOf("test1", "test2"), util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
 
                             Log.d("DBG::COMPANY", "${model.company}")
                             Log.d("DBG::IMAGE", "${model.image}")
@@ -324,6 +324,8 @@ class EditActivity : AppCompatActivity() {
                     }
                     // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
                     base64Image = util.bitmapToBase64(bitmap)
+
+
                 }
             }
         }

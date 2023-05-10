@@ -91,6 +91,7 @@ class SocialFragment : Fragment(), OnDataSelectedListener {
         account?.let {
             Toast.makeText(context_, "자동 로그인 완료!", Toast.LENGTH_SHORT).show()
             binding.viewLogin.visibility = View.GONE
+            memberCheckAPI(SharedManager.read(SharedManager.AUTH_TOKEN,"").toString(), SharedManager.read(SharedManager.LOGIN_ID,"").toString())
             return true
         } ?: return false
     }

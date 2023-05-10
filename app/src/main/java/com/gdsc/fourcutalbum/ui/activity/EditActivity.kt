@@ -153,7 +153,7 @@ class EditActivity : AppCompatActivity() {
 
                 if(public_yn.equals("Y")){
                     // 전체공개 하는 경우 - 로그인 체크
-                    val loginUID = SharedManager.read(SharedManager.LOGIN_ID, "1")!!
+                    val loginUID = SharedManager.read(SharedManager.AUTH_TOKEN, "1")!!
                     if(loginUID == "1"){
                         // 로그인 되어있지 않은 경우
                         // dialog --> 로그인이 필요합니다. 로그인 하시겠습니까?
@@ -180,7 +180,7 @@ class EditActivity : AppCompatActivity() {
                                 base64Image, "test.jpeg",
                             hashtagList, util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
                             Log.d("Model.image:::", model.image)
-                            val data =  HttpService.create(Constants.SERVER_URL).createFeed(model)
+                            val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
                             var url : CreateFeedResponseModel? = null
                             Log.d("DBG:RETRO", "SENDED ${model.toString()}")
 

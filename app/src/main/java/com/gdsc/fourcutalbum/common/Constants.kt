@@ -9,7 +9,7 @@ class Constants{
     companion object {
 
         // 서버 URL
-        const val SERVER_URL = "http://54.180.148.255:8080/"
+        const val SERVER_URL = "http://3.34.96.254:8080/"
 
         // APIs
         const val API_SIGNUP_CHECK = "signup-check" // 회원가입 체크 API

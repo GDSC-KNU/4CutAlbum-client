@@ -13,9 +13,7 @@ import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.provider.Settings
 import android.text.InputFilter
 import android.text.InputType
 import android.util.Log
@@ -28,15 +26,15 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.gdsc.fourcutalbum.R
-import com.gdsc.fourcutalbum.common.Constants
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.model.*
 import com.gdsc.fourcutalbum.data.repository.FourCutsRepositoryImpl
@@ -69,6 +67,8 @@ class EditActivity : AppCompatActivity() {
     private var public_yn : String = "N"
     private var save_feed_id : String? = null
     private var util = Util()
+    private var deleteFeed : Boolean = false // 삭제 가능 여부
+    private var deleteFeedId : String? = null
     lateinit var base64Image : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -165,15 +165,14 @@ class EditActivity : AppCompatActivity() {
 
                             Log.d("Model.image:::", model.image)
                             val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
-                            var response_feed_id : CreateFeedResponseModel? = null
                             Log.d("DBG:RETRO", "SENDED ${model.toString()}")
 
                             data.enqueue(object : Callback<CreateFeedResponseModel?> {
                                 override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {
                                     if (response.isSuccessful() && response.body() != null) {
-                                        Log.d("DBG:RETRO", "response success: " + response.body().toString())
-                                        response_feed_id = response.body()
-                                        save_feed_id = response_feed_id.toString()
+                                        Log.d("DBG:RETRO-CREATE_FEED", "response success: " + response.body().toString())
+                                        Log.d("DBG:RETRO-CF-CODE",response.code().toString())
+                                        save_feed_id = response.body().toString()
 
                                     }else{
                                         Log.d("DBG:RETRO", "response else: " + response.toString())
@@ -201,6 +200,33 @@ class EditActivity : AppCompatActivity() {
                     // 전체공개인데 서버 전송 실패
                     Toast.makeText(applicationContext, "서버 전송에 실패하였습니다. 나만 보기로 저장됩니다.", Toast.LENGTH_SHORT).show()
                     public_yn="N"
+                }
+
+                // 전체 공개 였다가 N으로 바꾼 경우 - 서버에 삭제 요청 전송
+                if(deleteFeed && public_yn.equals("N")){
+                    try {
+                        Log.d("DELTE:::", "삭제 시도")
+                        Log.d("feed_id::::", save_feed_id+" "+deleteFeedId)
+                        val data =  HttpService.create("http://3.34.96.254:8080/").deleteFeed(deleteFeedId!!)
+                        Log.d("DELTE:::", "enqueue 시도")
+                        data.enqueue(object : Callback<Void> {
+                            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    Log.d("DBG:RETRO", "response success: " + response.body().toString())
+                                }else{
+                                    Log.d("DBG:RETRO", "response else: " + response.toString())
+                                }
+                            }
+                            override fun onFailure(call: Call<Void>, t: Throwable) {
+                                t.printStackTrace()
+                            }
+                        })
+
+                    } catch (e:Exception){
+                        e.printStackTrace()
+                        Toast.makeText(context_,"서버와 연결이 불안정합니다. 잠시 후 다시 시도해 주세요.", Toast.LENGTH_LONG).show()
+                    }
+
                 }
 
                 // 전체 공개 여부 관련없이 Room DB저장
@@ -304,32 +330,37 @@ class EditActivity : AppCompatActivity() {
                     }
 
                     Glide.with(binding.root.context).load(it.photo)
+                        .fitCenter()
                         .override(Target.SIZE_ORIGINAL)
+                        .apply(RequestOptions().override(500, 500))
                         .into(binding.imageIv)
 
                     binding.imageIv.background = null
                     imageUri = it.photo
                     save_feed_id = it.feed_id
+                    deleteFeedId = it.feed_id
+                    Log.d("feed_id_set_data", it.feed_id.toString())
 
-                    // 이미지 uri를 bitmap으로 변경한다.
-                    var bitmap : Bitmap? = null
-                    try{
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-                            bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context_.contentResolver, imageUri))
-                            Log.d("bitmap:::", bitmap.toString())
-                        }else{ // API 29 이하
-                            bitmap = MediaStore.Images.Media.getBitmap(context_.contentResolver, imageUri)
-                        }
-                    }catch(e : IOException){
-                        e.printStackTrace()
-                    }
-                    // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
-                    base64Image = util.bitmapToBase64(bitmap)
-
+                    // 전체공개였던 경우, 피드 삭제 요청 가능
+                    if(public_yn.equals("Y")) deleteFeed = true
 
                 }
             }
         }
+        // 이미지 uri를 bitmap으로 변경한다. - 코루틴 밖으로 빼니까 권한 문제 없어짐. Why??
+        var bitmap : Bitmap? = null
+        try{
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context_.contentResolver, imageUri))
+                Log.d("bitmap:::", bitmap.toString())
+            }else{ // API 29 이하
+                bitmap = MediaStore.Images.Media.getBitmap(context_.contentResolver, imageUri)
+            }
+        }catch(e : IOException){
+            e.printStackTrace()
+        }
+        // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
+        base64Image = util.bitmapToBase64(bitmap)
     }
 
     private fun makeDialog(group: ChipGroup) {

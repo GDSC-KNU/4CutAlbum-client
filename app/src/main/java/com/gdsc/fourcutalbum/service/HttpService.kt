@@ -46,6 +46,12 @@ interface HttpService {
         @Body jsonParam: CreateFeedRequestModel
     ): Call<CreateFeedResponseModel>
 
+    @DELETE(Constants.DELETE_FEED)
+    @Headers("accept: application/json","charset:utf-8")
+    fun deleteFeed(
+        @Query("id") feedId: String
+    ): Call<Void>
+
 
     companion object {
         fun create(BASE_URL: String): HttpService {

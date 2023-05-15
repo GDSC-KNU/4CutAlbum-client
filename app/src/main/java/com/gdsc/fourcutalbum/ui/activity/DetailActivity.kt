@@ -75,7 +75,7 @@ class DetailActivity: AppCompatActivity() {
                         }
                         Glide.with(binding.root.context).load(it.photo)
                             .override(Target.SIZE_ORIGINAL)
-                            .apply(RequestOptions().override(600, 600))
+                            .apply(RequestOptions().override(500, 500))
                             .into(binding.imageIv)
                     }
                 }

@@ -15,7 +15,8 @@ class Constants{
         const val API_SIGNUP_CHECK = "signup-check" // 회원가입 체크 API
         const val API_SIGNUP       = "signup"       // 회원가입 API
         const val FEEDS            = "feeds/list"        // 전체 피드 불러오기 API
-        const val FEEDDETAIL       = "feeds/"        // 전체 피드 불러오기 API
+        const val FEEDDETAIL       = "feeds/"        // 피드 디테일 불러오기 API
         const val CREATE_FEED      = "feeds"       // 피드 생성 API
+        const val DELETE_FEED      = "feeds/"      // 피드 삭제 API
     }
 }

@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.gdsc.fourcutalbum.data.db.FourCutsDatabase
 import com.gdsc.fourcutalbum.data.model.FourCuts
@@ -73,6 +74,7 @@ class ImageActivity : AppCompatActivity() {
                     it.apply {
                         Glide.with(binding.root.context).load(it.photo)
                             .override(Target.SIZE_ORIGINAL)
+                            .apply(RequestOptions().override(500, 500))
                             .into(binding.imageFull)
                     }
                 }

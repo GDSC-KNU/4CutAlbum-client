@@ -44,7 +44,7 @@ interface HttpService {
     @Headers("accept: application/json","charset:utf-8")
     fun createFeed(
         @Body jsonParam: CreateFeedRequestModel
-    ): Call<CreateFeedResponseModel>
+    ): Call<String>
 
     @DELETE(Constants.DELETE_FEED)
     @Headers("accept: application/json","charset:utf-8")

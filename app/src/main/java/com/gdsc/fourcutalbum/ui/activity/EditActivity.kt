@@ -48,6 +48,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 import com.magical.near.common.util.SharedManager
 import kotlinx.coroutines.flow.collectLatest
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -58,6 +59,8 @@ class EditActivity : AppCompatActivity() {
     private val binding: ActivityEditBinding by lazy {
         ActivityEditBinding.inflate(layoutInflater)
     }
+
+    companion object { const val REQ_GALLERY = 1 }
 
     lateinit var fourCutsViewModel: FourCutsViewModel
     lateinit var context_: Context
@@ -167,19 +170,23 @@ class EditActivity : AppCompatActivity() {
                             val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
                             Log.d("DBG:RETRO", "SENDED ${model.toString()}")
 
-                            data.enqueue(object : Callback<CreateFeedResponseModel?> {
-                                override fun onResponse(call: Call<CreateFeedResponseModel?>, response: Response<CreateFeedResponseModel?>) {
+                            data.enqueue(object : Callback<String?> {
+                                override fun onResponse(call: Call<String?>, response: Response<String?>) {
                                     if (response.isSuccessful() && response.body() != null) {
                                         Log.d("DBG:RETRO-CREATE_FEED", "response success: " + response.body().toString())
                                         Log.d("DBG:RETRO-CF-CODE",response.code().toString())
-                                        save_feed_id = response.body().toString()
+
+                                        // JSON 파싱해서 값 담기
+                                        save_feed_id = try{ JSONObject(response.body().toString()).getString("saveFeedID") } catch (e: Exception){ "" }
+                                        Log.d("DBG:RETRO-CREATE_FEED", "feed id save success: $save_feed_id")
+
 
                                     }else{
                                         Log.d("DBG:RETRO", "response else: " + response.toString())
                                     }
                                     // finish()
                                 }
-                                override fun onFailure(call: Call<CreateFeedResponseModel?>, t: Throwable) {
+                                override fun onFailure(call: Call<String?>, t: Throwable) {
                                     t.printStackTrace()
                                     isSuccessCreateFeed = false
                                 }
@@ -438,18 +445,7 @@ class EditActivity : AppCompatActivity() {
     }
 
 
-    companion object {
-        const val REVIEW_MIN_LENGTH = 10
 
-        // 갤러리 권한 요청
-        const val REQ_GALLERY = 1
-
-        // API 호출시 Parameter key값
-        const val PARAM_KEY_IMAGE = "image"
-        const val PARAM_KEY_PRODUCT_ID = "product_id"
-        const val PARAM_KEY_REVIEW = "review_content"
-        const val PARAM_KEY_RATING = "rating"
-    }
 
     private fun selectGallery() {
         val writePermission =
@@ -497,6 +493,7 @@ class EditActivity : AppCompatActivity() {
             // 이미지를 받으면 ImageView에 적용한다
             val temp = result.data?.data
             if (temp != null) {
+                //contentResolver.takePersistableUriPermission(temp, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 imageUri = temp
             }
             imageUri?.let {

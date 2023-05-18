@@ -60,6 +60,7 @@
                 android:background="@drawable/round_tv"
                 android:fontFamily="@font/leferi"
                 android:hint="입력해 주세요."
+                android:textSize="15sp"
                 android:padding="12dp"
                 android:textFontWeight="900"
                 app:layout_constraintTop_toBottomOf="@id/editCommentDes" />
@@ -239,6 +240,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_margin="10dp"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/round_button"
                 android:text="저 장"
                 android:textColor="@color/white"

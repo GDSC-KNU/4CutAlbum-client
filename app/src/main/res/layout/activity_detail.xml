@@ -197,6 +197,42 @@
                     android:textAlignment="center"
                     android:textFontWeight="900"/>
             </androidx.cardview.widget.CardView>
+
+            <LinearLayout
+                android:id="@+id/publicYNlayout"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/comment_cv">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="이 사진은 "
+                    android:textFontWeight="900"
+                    app:layout_constraintTop_toBottomOf="@id/comment_cv"
+                    tools:layout_editor_absoluteX="5dp"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/publicYNtext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="나만 보기"
+                    android:textFontWeight="900"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toBottomOf="@id/comment_cv"
+                    tools:layout_editor_absoluteX="5dp"
+                    android:textColor="@color/main_color"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" 중입니다."
+                    android:textFontWeight="900"
+                    app:layout_constraintTop_toBottomOf="@id/comment_cv"
+                    tools:layout_editor_absoluteX="5dp"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

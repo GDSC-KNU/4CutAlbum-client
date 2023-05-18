@@ -77,6 +77,7 @@ class DetailActivity: AppCompatActivity() {
                             .override(Target.SIZE_ORIGINAL)
                             .apply(RequestOptions().override(500, 500))
                             .into(binding.imageIv)
+                        if(public_yn.equals("Y")) binding.publicYNtext.text = "전체 공개"
                     }
                 }
             }

@@ -125,11 +125,15 @@ class EditActivity : AppCompatActivity() {
             val chipList = util.makeChipList(binding.editFriendGroup)
             val hashtagList = util.makeChipList(binding.editHashtagGroup)
             var isSuccessCreateFeed = true
+
+            var isPublic = false
+
             if (imageUri == Uri.EMPTY)
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
             else { // 사진이 있는 경우 저장 진행
 
                 if(public_yn.equals("Y")){
+                    isPublic = true
                     // 전체공개 하는 경우 - 로그인 체크
                     val loginUID = SharedManager.read(SharedManager.AUTH_TOKEN, "1")!!
                     if(loginUID == "1"){
@@ -180,11 +184,39 @@ class EditActivity : AppCompatActivity() {
                                         save_feed_id = try{ JSONObject(response.body().toString()).getString("saveFeedID") } catch (e: Exception){ "" }
                                         Log.d("DBG:RETRO-CREATE_FEED", "feed id save success: $save_feed_id")
 
+                                        // 전체 공개일때 네트워크 처리가 완료된 후 Room DB저장
+                                        if(isPublic){
+                                            val fourCuts =
+                                                FourCuts(
+                                                    binding.editTitle.text.toString(),
+                                                    imageUri,
+                                                    chipList.toList(),
+                                                    studio,
+                                                    binding.editComment.text.toString(),
+                                                    public_yn,
+                                                    people?.let { it1 -> util.peopleToValue(it1) },
+                                                    hashtagList,
+                                                    save_feed_id
+                                                )
+                                            if (id > 0) fourCutsViewModel.updateFourCuts(
+                                                fourCuts.title,
+                                                fourCuts.photo,
+                                                fourCuts.friends,
+                                                fourCuts.place,
+                                                fourCuts.comment,
+                                                fourCuts.public_yn,
+                                                fourCuts.people,
+                                                fourCuts.hashtag,
+                                                fourCuts.feed_id,
+                                                id)
+                                            else fourCutsViewModel.saveFourCuts(fourCuts)
+                                            finish()
+                                        }
 
                                     }else{
                                         Log.d("DBG:RETRO", "response else: " + response.toString())
                                     }
-                                    // finish()
+
                                 }
                                 override fun onFailure(call: Call<String?>, t: Throwable) {
                                     t.printStackTrace()
@@ -236,32 +268,35 @@ class EditActivity : AppCompatActivity() {
 
                 }
 
-                // 전체 공개 여부 관련없이 Room DB저장
-                val fourCuts =
-                    FourCuts(
-                        binding.editTitle.text.toString(),
-                        imageUri,
-                        chipList.toList(),
-                        studio,
-                        binding.editComment.text.toString(),
-                        public_yn,
-                        people?.let { it1 -> util.peopleToValue(it1) },
-                        hashtagList,
-                        save_feed_id
-                    )
-                if (id > 0) fourCutsViewModel.updateFourCuts(
-                    fourCuts.title,
-                    fourCuts.photo,
-                    fourCuts.friends,
-                    fourCuts.place,
-                    fourCuts.comment,
-                    fourCuts.public_yn,
-                    fourCuts.people,
-                    fourCuts.hashtag,
-                    fourCuts.feed_id,
-                    id)
-                else fourCutsViewModel.saveFourCuts(fourCuts)
-                finish()
+                // 전체 공개 여부 아닐 때 Room DB저장
+                if(!isPublic){
+                    val fourCuts =
+                        FourCuts(
+                            binding.editTitle.text.toString(),
+                            imageUri,
+                            chipList.toList(),
+                            studio,
+                            binding.editComment.text.toString(),
+                            public_yn,
+                            people?.let { it1 -> util.peopleToValue(it1) },
+                            hashtagList,
+                            save_feed_id
+                        )
+                    if (id > 0) fourCutsViewModel.updateFourCuts(
+                        fourCuts.title,
+                        fourCuts.photo,
+                        fourCuts.friends,
+                        fourCuts.place,
+                        fourCuts.comment,
+                        fourCuts.public_yn,
+                        fourCuts.people,
+                        fourCuts.hashtag,
+                        fourCuts.feed_id,
+                        id)
+                    else fourCutsViewModel.saveFourCuts(fourCuts)
+                    finish()
+                }
+
             }
 
         }

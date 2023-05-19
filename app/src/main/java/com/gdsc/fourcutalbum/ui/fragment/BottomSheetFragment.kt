@@ -13,11 +13,13 @@ import androidx.core.view.isEmpty
 import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.service.OnDataSelectedListener
 import com.gdsc.fourcutalbum.databinding.FragmentBottomSheetBinding
+import com.gdsc.fourcutalbum.service.HttpService
 import com.gdsc.fourcutalbum.util.Util
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import kotlinx.coroutines.*
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
     private var listener: OnDataSelectedListener? = null
@@ -156,7 +158,20 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
             return chip
         }
         requireContext()?.let {
-            util.makeSpinner(spinner, R.array.shashtag, it)
+            CoroutineScope(Dispatchers.Main).launch {
+                val deferredList: Deferred<ArrayList<String>> = async(Dispatchers.IO) {
+                    val data = HttpService.create("http://3.34.96.254:8080/").getHashtags()
+                    val dataList = data.execute().body()!!.hashtags
+                    dataList
+                }
+                launch{
+                    val dataList = deferredList.await()
+                    dataList.add(0, "전체")
+                    Log.d("DBG:RETRO", dataList.toString())
+                    if(dataList.isEmpty()) util.makeSpinner(spinner, R.array.shashtag, it)
+                    else util.makeDynamicSpinner(spinner, dataList, it)
+                }
+            }
             spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                     hashtag = parent.getItemAtPosition(position).toString()

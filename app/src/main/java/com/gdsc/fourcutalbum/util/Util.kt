@@ -35,6 +35,16 @@ class Util {
         spinner.adapter = spinnerAdapter
     }
 
+    fun makeDynamicSpinner(spinner : Spinner, dataList: ArrayList<String>, context : Context){ // 스피너 뷰, 배열 ID, Context
+//        val spinner : Spinner = binding.searchStudioSpinner
+        val spinnerAdapter : ArrayAdapter<String> = ArrayAdapter(context,
+            R.layout.item_spinner_transparent,
+            dataList
+        );
+        spinnerAdapter.setDropDownViewResource(R.layout.item_spinner)
+        spinner.adapter = spinnerAdapter
+    }
+
     fun makeChipList(group: ChipGroup): ArrayList<String> {
         val chipList = ArrayList<String>()
         for (i: Int in 1..group.childCount) {

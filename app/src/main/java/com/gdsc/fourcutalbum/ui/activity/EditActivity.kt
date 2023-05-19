@@ -26,9 +26,7 @@ import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -47,6 +45,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
 import com.magical.near.common.util.SharedManager
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import org.json.JSONObject
 import retrofit2.Call
@@ -160,7 +159,7 @@ class EditActivity : AppCompatActivity() {
                             // TODO ::: GLACIER -> 로그인시에 UID와 Email을 SharedPreference에 저장하여 사용하는 방식은 어떤지? 일단 적용해놨습니다
                             val model = CreateFeedRequestModel("1",
                                 base64Image, "test.jpeg",
-                            arrayListOf("test1", "test2"), util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
+                                arrayListOf("test1", "test2"), util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
 
                             Log.d("DBG::COMPANY", "${model.company}")
                             Log.d("DBG::IMAGE", "${model.image}")
@@ -305,7 +304,8 @@ class EditActivity : AppCompatActivity() {
 
     private fun initStudioSpinner() {
         val spinner : Spinner = binding.editStudioSpinner
-        util.makeSpinner(spinner, R.array.studio, this)
+        var dataList = ArrayList<String>()
+        util.makeDynamicSpinner(spinner, dataList, this)
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 studio = parent.getItemAtPosition(position).toString()
@@ -368,7 +368,7 @@ class EditActivity : AppCompatActivity() {
                     if(!hashtag.isNullOrEmpty()) { // 기존 데이터 대비
                         for (tag: String in hashtag!!) binding.editHashtagGroup
                             .addView(util.makeChip(tag, binding.editHashtagGroup, this@EditActivity)
-                        )
+                            )
                     }
 
                     Glide.with(binding.root.context).load(it.photo)
@@ -440,8 +440,21 @@ class EditActivity : AppCompatActivity() {
     private fun makeDialog2(group: ChipGroup) { // Dialog - Spinner
         val sp = Spinner(this)
         var hashtag : String? = ""
+        CoroutineScope(Dispatchers.Main).launch {
+            val deferredList: Deferred<ArrayList<String>> = async(Dispatchers.IO) {
+                val data = HttpService.create("http://3.34.96.254:8080/").getHashtags()
+                val dataList = data.execute().body()!!.hashtags
+                dataList
+            }
+
+            launch{
+                val dataList = deferredList.await()
+                Log.d("DBG:RETRO", dataList.toString())
+                if(dataList.isEmpty()) util.makeSpinner(sp, R.array.hashtag, context_)
+                else util.makeDynamicSpinner(sp, dataList, context_)
+            }
+        }
         sp.setBackgroundResource(R.drawable.spinner)
-        util.makeSpinner(sp, R.array.hashtag, this)
         sp.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 hashtag = parent.getItemAtPosition(position).toString()

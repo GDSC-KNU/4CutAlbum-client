@@ -52,6 +52,10 @@ interface HttpService {
         @Query("id") feedId: String
     ): Call<Void>
 
+    @GET(Constants.GET_HASHTAGS)
+    @Headers("accept: application/json","charset:utf-8")
+    fun getHashtags(): Call<GetHashtagsModel>
+
 
     companion object {
         fun create(BASE_URL: String): HttpService {

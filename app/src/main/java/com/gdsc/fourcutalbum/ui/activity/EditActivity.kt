@@ -304,8 +304,20 @@ class EditActivity : AppCompatActivity() {
 
     private fun initStudioSpinner() {
         val spinner : Spinner = binding.editStudioSpinner
-        var dataList = ArrayList<String>()
-        util.makeDynamicSpinner(spinner, dataList, this)
+        CoroutineScope(Dispatchers.Main).launch {
+            val deferredList: Deferred<ArrayList<String>> = async(Dispatchers.IO) {
+                val data = HttpService.create("http://3.34.96.254:8080/").getCompanyName()
+                val dataList = data.execute().body()!!.companyNames
+                dataList
+            }
+
+            launch{
+                val dataList = deferredList.await()
+                Log.d("DBG:RETRO", dataList.toString())
+                if(dataList.isEmpty()) util.makeSpinner(spinner, R.array.hashtag, context_)
+                else util.makeDynamicSpinner(spinner, dataList, context_)
+            }
+        }
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 studio = parent.getItemAtPosition(position).toString()
@@ -386,23 +398,25 @@ class EditActivity : AppCompatActivity() {
                     // 전체공개였던 경우, 피드 삭제 요청 가능
                     if(public_yn.equals("Y")) deleteFeed = true
 
+                    // 이미지 uri를 bitmap으로 변경한다. - 코루틴 밖으로 빼니까 권한 문제 없어짐. Why??
+                    var bitmap : Bitmap? = null
+                    try{
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                            bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context_.contentResolver, imageUri))
+                            Log.d("bitmap:::", bitmap.toString())
+                        }else{ // API 29 이하
+                            bitmap = MediaStore.Images.Media.getBitmap(context_.contentResolver, imageUri)
+                        }
+                    }catch(e : IOException){
+                        e.printStackTrace()
+                    }
+                    // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
+                    base64Image = util.bitmapToBase64(bitmap)
+
                 }
             }
         }
-        // 이미지 uri를 bitmap으로 변경한다. - 코루틴 밖으로 빼니까 권한 문제 없어짐. Why??
-        var bitmap : Bitmap? = null
-        try{
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-                bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context_.contentResolver, imageUri))
-                Log.d("bitmap:::", bitmap.toString())
-            }else{ // API 29 이하
-                bitmap = MediaStore.Images.Media.getBitmap(context_.contentResolver, imageUri)
-            }
-        }catch(e : IOException){
-            e.printStackTrace()
-        }
-        // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
-        base64Image = util.bitmapToBase64(bitmap)
+
     }
 
     private fun makeDialog(group: ChipGroup) {

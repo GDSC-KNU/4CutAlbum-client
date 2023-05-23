@@ -56,6 +56,9 @@ interface HttpService {
     @Headers("accept: application/json","charset:utf-8")
     fun getHashtags(): Call<GetHashtagsModel>
 
+    @GET(Constants.GET_COMPANY)
+    @Headers("accept: application/json","charset:utf-8")
+    fun getCompanyName(): Call<GetCompanyModel>
 
     companion object {
         fun create(BASE_URL: String): HttpService {

@@ -19,5 +19,7 @@ class Constants{
         const val CREATE_FEED      = "feeds"       // 피드 생성 API
         const val DELETE_FEED      = "feeds/"      // 피드 삭제 API
         const val GET_HASHTAGS     = "hashtags"     // 해시태그 목록 가져오기 API
+        const val GET_COMPANY      = "company"     // 해시태그 목록 가져오기 API
+
     }
 }

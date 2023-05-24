@@ -72,6 +72,9 @@ class EditActivity : AppCompatActivity() {
     private var deleteFeed : Boolean = false // 삭제 가능 여부
     private var deleteFeedId : String? = null
     lateinit var base64Image : String
+    lateinit var previousFeed: IsUpdateFeed
+    private var updateFeedId : String? = null
+    private var loginUID = "1"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -124,17 +127,15 @@ class EditActivity : AppCompatActivity() {
             val chipList = util.makeChipList(binding.editFriendGroup)
             val hashtagList = util.makeChipList(binding.editHashtagGroup)
             var isSuccessCreateFeed = true
-
             var isPublic = false
 
             if (imageUri == Uri.EMPTY)
                 Snackbar.make(it, "사진을 등록해주세요!", Snackbar.LENGTH_SHORT).show()
             else { // 사진이 있는 경우 저장 진행
-
                 if(public_yn.equals("Y")){
                     isPublic = true
                     // 전체공개 하는 경우 - 로그인 체크
-                    val loginUID = SharedManager.read(SharedManager.AUTH_TOKEN, "1")!!
+                    loginUID = SharedManager.read(SharedManager.AUTH_TOKEN, "1")!!
                     if(loginUID == "1"){
                         // 로그인 되어있지 않은 경우
                         // dialog --> 로그인이 필요합니다. 로그인 하시겠습니까?
@@ -157,72 +158,134 @@ class EditActivity : AppCompatActivity() {
                             // TODO ::: UID 받아오려면 Member Check도 해야하고, 회원가입 여부도 check해야하고... ---> Social에 있는 코드를 밖으로 빼는건 어떤지
 
                             // TODO ::: GLACIER -> 로그인시에 UID와 Email을 SharedPreference에 저장하여 사용하는 방식은 어떤지? 일단 적용해놨습니다
-                            val model = CreateFeedRequestModel("1",
+                            // 코멘트 전처리
+                            var comment = ""
+                            if(binding.editComment.text.toString().isNotEmpty()) comment = binding.editComment.text.toString()
+                            else comment = "   "
+
+                            val model = CreateFeedRequestModel(loginUID,
                                 base64Image, "test.jpeg",
-                                arrayListOf("test1", "test2"), util.peopleToValue(people!!), studio!!, binding.editComment.text.toString())
+                                arrayListOf("test1", "test2"), util.peopleToValue(people!!), studio!!, comment)
+                            val currentFeed = IsUpdateFeed(loginUID, model.people_count, model.comment, model.company, model.hashtags)
+                            var isUpdateBit = false
+
+                            if(updateFeedId != null && previousFeed != currentFeed) isUpdateBit = true
+                            Log.d("DBG::VALUE", isUpdateBit.toString())
 
                             Log.d("DBG::COMPANY", "${model.company}")
                             Log.d("DBG::IMAGE", "${model.image}")
                             Log.d("DBG::IMAGENAME", "${model.image_name}")
                             Log.d("DBG::UID", "${model.uid}")
                             Log.d("DBG::PEOPLECOUNT", "${model.people_count}")
-                            Log.d("DBG::COMMENT", "${model.comment}")
+                            Log.d("DBG::COMMENT", "$comment -comment")
                             Log.d("DBG::HASHTAG", "${model.hashtags}")
 
-                            Log.d("Model.image:::", model.image)
-                            val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
-                            Log.d("DBG:RETRO", "SENDED ${model.toString()}")
+                            if(isUpdateBit){
+                                val updateModel = UpdateFeedRequestModel(
+                                    loginUID, currentFeed.peopleCount.toLong(), currentFeed.comment, currentFeed.studio, currentFeed.hashtags)
+                                val data =  HttpService.create("http://3.34.96.254:8080/").updateFeed(updateFeedId!!, updateModel)
+                                Log.d("DBG:RETRO", "SENDED ${model.toString()}")
+                                data.enqueue(object : Callback<Void> {
+                                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                                        if (response.isSuccessful() && response.body() != null) {
+                                            Log.d("DBG:RETRO-UPDATE_FEED", "response success: ")
 
-                            data.enqueue(object : Callback<String?> {
-                                override fun onResponse(call: Call<String?>, response: Response<String?>) {
-                                    if (response.isSuccessful() && response.body() != null) {
-                                        Log.d("DBG:RETRO-CREATE_FEED", "response success: " + response.body().toString())
-                                        Log.d("DBG:RETRO-CF-CODE",response.code().toString())
+                                            // 전체 공개일때 네트워크 처리가 완료된 후 Room DB저장
+                                            if(isPublic){
+                                                val fourCuts =
+                                                    FourCuts(
+                                                        binding.editTitle.text.toString(),
+                                                        imageUri,
+                                                        chipList.toList(),
+                                                        studio,
+                                                        binding.editComment.text.toString(),
+                                                        public_yn,
+                                                        people?.let { it1 -> util.peopleToValue(it1) },
+                                                        hashtagList,
+                                                        save_feed_id
+                                                    )
+                                                if (id > 0) fourCutsViewModel.updateFourCuts(
+                                                    fourCuts.title,
+                                                    fourCuts.photo,
+                                                    fourCuts.friends,
+                                                    fourCuts.place,
+                                                    fourCuts.comment,
+                                                    fourCuts.public_yn,
+                                                    fourCuts.people,
+                                                    fourCuts.hashtag,
+                                                    fourCuts.feed_id,
+                                                    id)
+                                                else fourCutsViewModel.saveFourCuts(fourCuts)
+                                                finish()
+                                            }
 
-                                        // JSON 파싱해서 값 담기
-                                        save_feed_id = try{ JSONObject(response.body().toString()).getString("saveFeedID") } catch (e: Exception){ "" }
-                                        Log.d("DBG:RETRO-CREATE_FEED", "feed id save success: $save_feed_id")
-
-                                        // 전체 공개일때 네트워크 처리가 완료된 후 Room DB저장
-                                        if(isPublic){
-                                            val fourCuts =
-                                                FourCuts(
-                                                    binding.editTitle.text.toString(),
-                                                    imageUri,
-                                                    chipList.toList(),
-                                                    studio,
-                                                    binding.editComment.text.toString(),
-                                                    public_yn,
-                                                    people?.let { it1 -> util.peopleToValue(it1) },
-                                                    hashtagList,
-                                                    save_feed_id
-                                                )
-                                            if (id > 0) fourCutsViewModel.updateFourCuts(
-                                                fourCuts.title,
-                                                fourCuts.photo,
-                                                fourCuts.friends,
-                                                fourCuts.place,
-                                                fourCuts.comment,
-                                                fourCuts.public_yn,
-                                                fourCuts.people,
-                                                fourCuts.hashtag,
-                                                fourCuts.feed_id,
-                                                id)
-                                            else fourCutsViewModel.saveFourCuts(fourCuts)
-                                            finish()
+                                        }else{
+                                            Log.d("DBG:RETRO-update_feed", "response else: " + response.toString())
                                         }
 
-                                    }else{
-                                        Log.d("DBG:RETRO", "response else: " + response.toString())
                                     }
+                                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                                        t.printStackTrace()
+                                        isSuccessCreateFeed = false
+                                    }
+                                })
 
-                                }
-                                override fun onFailure(call: Call<String?>, t: Throwable) {
-                                    t.printStackTrace()
-                                    isSuccessCreateFeed = false
-                                }
-                            })
+                            }
+                            else{
+                                Log.d("Model.image:::", model.image)
+                                val data =  HttpService.create("http://3.34.96.254:8080/").createFeed(model)
+                                Log.d("DBG:RETRO", "SENDED ${model.toString()}")
+                                Log.d("DBG:VALUE", "login uid :$loginUID")
+                                data.enqueue(object : Callback<String?> {
+                                    override fun onResponse(call: Call<String?>, response: Response<String?>) {
+                                        if (response.isSuccessful() && response.body() != null) {
+                                            Log.d("DBG:RETRO-CREATE_FEED", "response success: " + response.body().toString())
+                                            Log.d("DBG:RETRO-CF-CODE",response.code().toString())
 
+                                            // JSON 파싱해서 값 담기
+                                            save_feed_id = try{ JSONObject(response.body().toString()).getString("saveFeedID") } catch (e: Exception){ "" }
+                                            Log.d("DBG:RETRO-CREATE_FEED", "feed id save success: $save_feed_id")
+
+                                            // 전체 공개일때 네트워크 처리가 완료된 후 Room DB저장
+                                            if(isPublic){
+                                                val fourCuts =
+                                                    FourCuts(
+                                                        binding.editTitle.text.toString(),
+                                                        imageUri,
+                                                        chipList.toList(),
+                                                        studio,
+                                                        binding.editComment.text.toString(),
+                                                        public_yn,
+                                                        people?.let { it1 -> util.peopleToValue(it1) },
+                                                        hashtagList,
+                                                        save_feed_id
+                                                    )
+                                                if (id > 0) fourCutsViewModel.updateFourCuts(
+                                                    fourCuts.title,
+                                                    fourCuts.photo,
+                                                    fourCuts.friends,
+                                                    fourCuts.place,
+                                                    fourCuts.comment,
+                                                    fourCuts.public_yn,
+                                                    fourCuts.people,
+                                                    fourCuts.hashtag,
+                                                    fourCuts.feed_id,
+                                                    id)
+                                                else fourCutsViewModel.saveFourCuts(fourCuts)
+                                                finish()
+                                            }
+
+                                        }else{
+                                            Log.d("DBG:RETRO", "response else: " + response.toString())
+                                        }
+
+                                    }
+                                    override fun onFailure(call: Call<String?>, t: Throwable) {
+                                        t.printStackTrace()
+                                        isSuccessCreateFeed = false
+                                    }
+                                })
+                            }
                         } catch (e:Exception){
                             e.printStackTrace()
                             isSuccessCreateFeed = false
@@ -352,8 +415,8 @@ class EditActivity : AppCompatActivity() {
         lifecycleScope.launchWhenCreated {
             fourCuts.collectLatest {
                 it.apply {
-                    for(x : String in resources.getStringArray(R.array.studio)){
-                        if(place.equals(x))
+                    for (x: String in resources.getStringArray(R.array.studio)) {
+                        if (place.equals(x))
                             position = resources.getStringArray(R.array.studio).indexOf(x)
                     }
 
@@ -369,17 +432,21 @@ class EditActivity : AppCompatActivity() {
                         binding.editFriendGroup.removeView(binding.editFriendGroup.getChildAt(0) as Chip)
 
                     }
-                    for (friend: String in friends!!) binding.editFriendGroup.addView(util.makeChip(
-                        friend, binding.editFriendGroup, this@EditActivity))
+                    for (friend: String in friends!!) binding.editFriendGroup.addView(
+                        util.makeChip(
+                            friend, binding.editFriendGroup, this@EditActivity
+                        )
+                    )
 
                     val cnt2 = binding.editHashtagGroup.childCount
                     for (i: Int in 1..cnt2) { // clear
                         binding.editHashtagGroup.removeView(binding.editHashtagGroup.getChildAt(0) as Chip)
 
                     }
-                    if(!hashtag.isNullOrEmpty()) { // 기존 데이터 대비
+                    if (!hashtag.isNullOrEmpty()) { // 기존 데이터 대비
                         for (tag: String in hashtag!!) binding.editHashtagGroup
-                            .addView(util.makeChip(tag, binding.editHashtagGroup, this@EditActivity)
+                            .addView(
+                                util.makeChip(tag, binding.editHashtagGroup, this@EditActivity)
                             )
                     }
 
@@ -393,10 +460,11 @@ class EditActivity : AppCompatActivity() {
                     imageUri = it.photo
                     save_feed_id = it.feed_id
                     deleteFeedId = it.feed_id
+                    updateFeedId = it.feed_id
                     Log.d("feed_id_set_data", it.feed_id.toString())
 
                     // 전체공개였던 경우, 피드 삭제 요청 가능
-                    if(public_yn.equals("Y")) deleteFeed = true
+                    if (public_yn.equals("Y")) deleteFeed = true
 
                     // 이미지 uri를 bitmap으로 변경한다. - 코루틴 밖으로 빼니까 권한 문제 없어짐. Why??
                     var bitmap : Bitmap? = null
@@ -413,10 +481,17 @@ class EditActivity : AppCompatActivity() {
                     // bitmap 이미지를 서버 전송을 위한 base64로 인코딩한다.
                     base64Image = util.bitmapToBase64(bitmap)
 
+                    var arrayList = arrayListOf<String>()
+                    if (it.hashtag?.isNotEmpty() == true) arrayList =
+                        it.hashtag as ArrayList<String>
+                    if (it.public_yn.equals("Y"))
+                        previousFeed = IsUpdateFeed(
+                            loginUID, it.people!!, it.comment ?: " ", it.place!!,
+                            arrayList
+                        )
                 }
             }
         }
-
     }
 
     private fun makeDialog(group: ChipGroup) {
@@ -600,4 +675,18 @@ class EditActivity : AppCompatActivity() {
         }
         return super.dispatchTouchEvent(ev)
     }
+
+    class IsUpdateFeed(val uid:String, val peopleCount: Int, val comment: String, val studio: String, val hashtags: ArrayList<String>) : Comparable<IsUpdateFeed>{
+
+        override fun compareTo(other: IsUpdateFeed) : Int =
+            when{
+                !this.uid.equals(other.uid) -> 1
+                this.peopleCount != other.peopleCount -> 1
+                !this.comment.equals(other.comment) -> 1
+                !this.studio.equals(other.studio) -> 1
+                !this.hashtags.equals(other.hashtags) -> 1
+                else->0
+            }
+    }
 }
+

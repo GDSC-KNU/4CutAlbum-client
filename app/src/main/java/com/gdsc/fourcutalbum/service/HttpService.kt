@@ -10,7 +10,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.*
 
-
 interface HttpService {
 
     @GET(Constants.API_SIGNUP_CHECK)
@@ -59,6 +58,13 @@ interface HttpService {
     @GET(Constants.GET_COMPANY)
     @Headers("accept: application/json","charset:utf-8")
     fun getCompanyName(): Call<GetCompanyModel>
+
+    @PUT(Constants.UPDATE_FEED)
+    @Headers("accept: application/json","charset:utf-8")
+    fun updateFeed(
+        @Path("id") id : String,
+        @Body jsonParam: UpdateFeedRequestModel
+    ): Call<Void>
 
     companion object {
         fun create(BASE_URL: String): HttpService {

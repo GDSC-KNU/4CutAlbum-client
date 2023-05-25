@@ -182,7 +182,7 @@ class EditActivity : AppCompatActivity() {
 
                             if(isUpdateBit){
                                 val updateModel = UpdateFeedRequestModel(
-                                    loginUID, currentFeed.peopleCount.toLong(), currentFeed.comment, currentFeed.studio, currentFeed.hashtags)
+                                    loginUID, currentFeed.peopleCount, currentFeed.comment, currentFeed.studio, currentFeed.hashtags)
                                 val data =  HttpService.create("http://3.34.96.254:8080/").updateFeed(updateFeedId!!, updateModel)
                                 Log.d("DBG:RETRO", "SENDED ${model.toString()}")
                                 data.enqueue(object : Callback<Void> {

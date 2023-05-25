@@ -8,7 +8,7 @@ package com.gdsc.fourcutalbum.data.model
 //}
 data class UpdateFeedRequestModel(
     val uid: String,
-    val peopleCount: Long,
+    val peopleCount: Int,
     val comment: String,
     val company: String,
     val hashtags: ArrayList<String>

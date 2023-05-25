@@ -13,6 +13,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.gdsc.fourcutalbum.R
 import com.gdsc.fourcutalbum.adapter.MainSampleAdapter
 import com.gdsc.fourcutalbum.data.model.FourCuts
 import com.gdsc.fourcutalbum.databinding.FragmentAlbumBinding
@@ -141,6 +142,9 @@ class AlbumFragment : Fragment() {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = mainAdapter
         }
+
+        if(mainAdapter!!.itemCount == 0) binding.rvMain.setBackgroundResource(R.drawable.nothing_background)
+        else binding.rvMain.background = null
 
         mainAdapter!!.notifyDataSetChanged()
     }

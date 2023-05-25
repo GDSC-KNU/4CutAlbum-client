@@ -165,7 +165,7 @@ class EditActivity : AppCompatActivity() {
 
                             val model = CreateFeedRequestModel(loginUID,
                                 base64Image, "test.jpeg",
-                                arrayListOf("test1", "test2"), util.peopleToValue(people!!), studio!!, comment)
+                                hashtagList, util.peopleToValue(people!!), studio!!, comment)
                             val currentFeed = IsUpdateFeed(loginUID, model.people_count, model.comment, model.company, model.hashtags)
                             var isUpdateBit = false
 
@@ -377,7 +377,7 @@ class EditActivity : AppCompatActivity() {
             launch{
                 val dataList = deferredList.await()
                 Log.d("DBG:RETRO", dataList.toString())
-                if(dataList.isEmpty()) util.makeSpinner(spinner, R.array.hashtag, context_)
+                if(dataList.isEmpty()) util.makeSpinner(spinner, R.array.studio, context_)
                 else util.makeDynamicSpinner(spinner, dataList, context_)
             }
         }

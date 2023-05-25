@@ -5,18 +5,22 @@
         <item>포토이즘</item>
         <item>포토시그니처</item>
         <item>하루필름</item>
-        <item>포토인더박스</item>
-        <item>포토그레이</item>
         <item>그믐달스튜디오</item>
-        <item>시현하다프레임</item>
-        <item>스냅치즈</item>
-        <item>홍대네컷</item>
         <item>모노맨션</item>
+        <item>비룸스튜디오</item>
         <item>셀픽스</item>
-        <item>포토랩플러스</item>
-        <item>해리포토</item>
-        <item>포토랩플러스</item>
+        <item>스냅치즈</item>
+        <item>시현하다프레임</item>
+        <item>인더숲</item>
+        <item>포토그레이</item>
         <item>포토드링크</item>
+        <item>포토랩플러스</item>
+        <item>포토매틱</item>
+        <item>포토인더박스</item>
+        <item>플레이인더박스</item>
+        <item>하마필름</item>
+        <item>홍대네컷</item>
+        <item>해리포토</item>
         <item>기타</item>
     </string-array>
 
@@ -29,10 +33,16 @@
     </string-array>
 
     <string-array name="hashtag">
-        <item>졸업</item>
         <item>생일</item>
         <item>커플</item>
-        <item>우정샷</item>
+        <item>가족</item>
+        <item>졸업</item>
+        <item>찐친vibe</item>
+        <item>데일리룩</item>
+        <item>사진맛집</item>
+        <item>포즈추천</item>
+        <item>아이돌과함께</item>
+        <item>요즘유행</item>
     </string-array>
 
     <string-array name="sstudio">
@@ -41,18 +51,22 @@
         <item>포토이즘</item>
         <item>포토시그니처</item>
         <item>하루필름</item>
-        <item>포토인더박스</item>
-        <item>포토그레이</item>
         <item>그믐달스튜디오</item>
-        <item>시현하다프레임</item>
-        <item>스냅치즈</item>
-        <item>홍대네컷</item>
         <item>모노맨션</item>
+        <item>비룸스튜디오</item>
         <item>셀픽스</item>
-        <item>포토랩플러스</item>
-        <item>해리포토</item>
-        <item>포토랩플러스</item>
+        <item>스냅치즈</item>
+        <item>시현하다프레임</item>
+        <item>인더숲</item>
+        <item>포토그레이</item>
         <item>포토드링크</item>
+        <item>포토랩플러스</item>
+        <item>포토매틱</item>
+        <item>포토인더박스</item>
+        <item>플레이인더박스</item>
+        <item>하마필름</item>
+        <item>홍대네컷</item>
+        <item>해리포토</item>
         <item>기타</item>
     </string-array>
 
@@ -67,9 +81,15 @@
 
     <string-array name="shashtag">
         <item>전체</item>
-        <item>졸업</item>
         <item>생일</item>
         <item>커플</item>
-        <item>우정샷</item>
+        <item>가족</item>
+        <item>졸업</item>
+        <item>찐친vibe</item>
+        <item>데일리룩</item>
+        <item>사진맛집</item>
+        <item>포즈추천</item>
+        <item>아이돌과함께</item>
+        <item>요즘유행</item>
     </string-array>
 </resources>

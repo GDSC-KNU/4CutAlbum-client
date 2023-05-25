@@ -103,7 +103,21 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     private fun initSearchStudioSpinner() {
         val spinner : Spinner = binding.searchStudioSpinner
         requireContext()?.let {
-            util.makeSpinner(spinner, R.array.sstudio, it)
+            CoroutineScope(Dispatchers.Main).launch {
+                val deferredList: Deferred<ArrayList<String>> = async(Dispatchers.IO) {
+                    val data = HttpService.create("http://3.34.96.254:8080/").getCompanyName()
+                    val dataList = data.execute().body()!!.companyNames
+                    dataList
+                }
+
+                launch {
+                    val dataList = deferredList.await()
+                    dataList.add(0, "전체")
+                    Log.d("DBG:RETRO", dataList.toString())
+                    if (dataList.isEmpty()) util.makeSpinner(spinner, R.array.sstudio, context_)
+                    else util.makeDynamicSpinner(spinner, dataList, context_)
+                }
+            }
             spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                     studio = parent.getItemAtPosition(position).toString()
